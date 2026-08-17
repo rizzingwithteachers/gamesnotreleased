@@ -6,7 +6,6 @@
   <title>Dashboard | RapidIdentity</title>
   <script src="../assets/theme-loader.js"></script>
   <link rel="stylesheet" href="../style.css">
-
   <style>
     body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: radial-gradient(circle at top, rgba(108,99,255,0.12), transparent 45%), var(--bg); color: var(--text); font-family: var(--font); }
     .auth-shell { width: min(520px, calc(100vw - 2rem)); padding: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 30px 90px rgba(0,0,0,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
@@ -16,7 +15,7 @@
     .auth-form { display: grid; gap: 1rem; }
     .input-group { display: grid; gap: 0.45rem; }
     .input-group label { font-size: 0.85rem; color: var(--text-muted); }
-    .input-group input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 14px; font: inherit; }
+    .input-group input { width: 100%; box-sizing: border-box; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 14px; font: inherit; }
     .input-group input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(108,99,255,0.12); }
     .auth-buttons { display: grid; gap: 0.85rem; }
     .auth-actions { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
@@ -26,202 +25,123 @@
   </style>
   <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
-
 <body>
-
 <main class="auth-shell">
-
-  <div class="auth-header">
-    <h1 id="auth-title">Sign in</h1>
-  </div>
-
+  <div class="auth-header"><h1 id="auth-title">Sign in</h1></div>
   <form id="auth-form" class="auth-form">
-
     <div id="name-field" class="input-group hidden">
-      <label>Username</label>
-      <input id="name" type="text" placeholder="Username">
+      <label for="name">Username</label>
+      <input id="name" type="text" placeholder="Username" autocomplete="username">
     </div>
-
     <div class="input-group">
-      <label>Email address</label>
-      <input id="email" type="email" placeholder="you@example.com" required>
+      <label for="email">Email address</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
     </div>
-
     <div class="input-group">
-      <label>Password</label>
-      <input id="password" type="password" placeholder="••••••••" required>
+      <label for="password">Password</label>
+      <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
     </div>
-
-    <div class="auth-buttons">
-      <button type="submit" id="auth-submit" class="btn-primary">Sign in</button>
-    </div>
-
+    <div class="auth-buttons"><button type="submit" id="auth-submit" class="btn-primary">Sign in</button></div>
     <div class="auth-actions">
       <span id="mode-text">Don’t have an account?</span>
       <button type="button" id="toggle-mode">Create account</button>
     </div>
-
   </form>
-
 </main>
-
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-/* SUPABASE CONFIG */
 const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
 const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
 const supabase = createClient(supabaseUrl, supabaseKey);
-
-/* ELEMENTS */
 const form = document.getElementById("auth-form");
 const title = document.getElementById("auth-title");
 const nameField = document.getElementById("name-field");
 const toggle = document.getElementById("toggle-mode");
 const submitBtn = document.getElementById("auth-submit");
-
 const email = document.getElementById("email");
 const password = document.getElementById("password");
 const nameInput = document.getElementById("name");
-
 let signUpMode = false;
 
-/* REAL-TIME SPACE FILTER STRIPPER */
-nameInput.addEventListener("input", (e) => {
-  e.target.value = e.target.value.replace(/\s/g, "");
-});
+nameInput.addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\s/g, ""); });
 
-/* SIGN UP */
 async function signUp(username, emailVal, passwordVal) {
-  if (!username?.trim()) {
-    alert("Username is required");
-    return false;
-  }
+  username = username.trim();
+  if (!username) { alert("Username is required"); return false; }
+  if (/\s/.test(username)) { alert("Username cannot contain spaces!"); return false; }
 
-  if (/\s/.test(username)) {
-    alert("Username cannot contain spaces!");
-    return false;
-  }
+  const { data: existingUsers, error: checkError } = await supabase.from("users").select("id").eq("username", username).limit(1);
+  if (checkError) { console.error("Error checking username:", checkError); alert("An error occurred while checking username availability. Please try again."); return false; }
+  if (existingUsers?.length) { alert("This username is already taken! Please choose a different one."); return false; }
 
-  // Check if the username already exists in the database
-  const { data: existingUsers, error: checkError } = await supabase
-    .from("users")
-    .select("id")
-    .eq("username", username.trim())
-    .limit(1);
+  const { data, error } = await supabase.auth.signUp({ email: emailVal, password: passwordVal });
+  if (error) { alert(error.message); return false; }
+  if (!data?.user) { alert("Account creation did not return a user. Please try again."); return false; }
 
-  if (checkError) {
-    console.error("Error checking username:", checkError);
-    alert("An error occurred while checking username availability. Please try again.");
-    return false;
-  }
-
-  if (existingUsers && existingUsers.length > 0) {
-    alert("This username is already taken! Please choose a different one.");
-    return false;
-  }
-
-  const { data, error } = await supabase.auth.signUp({
+  const { error: profileError } = await supabase.from("users").insert([{
+    id: data.user.id,
+    username,
     email: emailVal,
-    password: passwordVal
-  });
+    role: "user",
+    rank: "basic",
+    createdAt: Date.now()
+  }]);
 
-  if (error) {
-    alert(error.message);
+  if (profileError) {
+    console.error("Failed to create user profile:", profileError);
+    // Do not send the user into the app with a missing profile.
+    await supabase.auth.signOut();
+    alert("Your account was created, but your profile could not be created. Please try again or contact the site owner.");
     return false;
-  }
-
-  if (data?.user) {
-    // Inject profile properties directly inside your public schema tracking system
-    const { error: profileError } = await supabase
-      .from("users")
-      .insert([
-        {
-          id: data.user.id,
-          username: username.trim(),
-          email: emailVal,
-          role: "user",
-          rank: "basic",
-          createdAt: Date.now()
-        }
-      ]);
-
-    if (profileError) {
-      console.error("Failed structural profile provisioning logic maps:", profileError.message);
-    }
   }
 
   return true;
 }
 
-/* SIGN IN */
 async function signIn(emailVal, passwordVal) {
-  const { error } = await supabase.auth.signInWithPassword({
-    email: emailVal,
-    password: passwordVal
-  });
+  const { data, error } = await supabase.auth.signInWithPassword({ email: emailVal, password: passwordVal });
+  if (error) { alert(error.message); return false; }
 
-  if (error) {
-    alert(error.message);
+  // Verify that the application profile exists before entering the app.
+  const { data: profile, error: profileError } = await supabase.from("users").select("id").eq("id", data.user.id).maybeSingle();
+  if (profileError || !profile) {
+    console.error("User profile missing or unavailable:", profileError);
+    await supabase.auth.signOut();
+    alert("Your account profile could not be loaded. Please contact the site owner.");
     return false;
   }
   return true;
 }
 
-/* TOGGLE MODE */
 toggle.addEventListener("click", () => {
   signUpMode = !signUpMode;
-
   nameField.classList.toggle("hidden", !signUpMode);
   nameInput.required = signUpMode;
-
   title.textContent = signUpMode ? "Create account" : "Sign in";
   submitBtn.textContent = signUpMode ? "Create account" : "Sign in";
-
-  document.getElementById("mode-text").textContent =
-    signUpMode ? "Already have an account?" : "Don't have an account?";
-
+  document.getElementById("mode-text").textContent = signUpMode ? "Already have an account?" : "Don't have an account?";
   toggle.textContent = signUpMode ? "Sign in" : "Create account";
+  password.autocomplete = signUpMode ? "new-password" : "current-password";
 });
 
-/* FORM SUBMISSION */
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const emailVal = email.value.trim();
-  const passwordVal = password.value.trim();
+  const passwordVal = password.value;
   const usernameVal = nameInput.value.trim();
+  if (!emailVal || !passwordVal) { alert("Enter email and password"); return; }
 
-  if (!emailVal || !passwordVal) {
-    alert("Enter email and password");
-    return;
-  }
-
-  let ok = false;
-
+  submitBtn.disabled = true;
   try {
-    if (signUpMode) {
-      ok = await signUp(usernameVal, emailVal, passwordVal);
-    } else {
-      ok = await signIn(emailVal, passwordVal);
-    }
-
-    if (ok) {
-      window.location.replace("../chat/");
-    }
+    const ok = signUpMode ? await signUp(usernameVal, emailVal, passwordVal) : await signIn(emailVal, passwordVal);
+    if (ok) window.location.replace("../chat/");
   } catch (error) {
     console.error("Authentication Error:", error);
-    alert(error.message);
-  }
-});
-
-/* AUTH CHECK */
-supabase.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    // Keep user state tracked if needed
+    alert(error.message || "Authentication failed.");
+  } finally {
+    submitBtn.disabled = false;
   }
 });
 </script>
-
 </body>
 </html>
