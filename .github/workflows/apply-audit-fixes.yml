@@ -1,0 +1,145 @@
+name: Apply audited bug fixes
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: !startsWith(github.event.head_commit.message, 'chore: apply audited fixes')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply safe fixes outside excluded paths
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          def edit(path, fn):
+              p = Path(path)
+              s = p.read_text(encoding='utf-8')
+              out = fn(s)
+              if out != s:
+                  p.write_text(out, encoding='utf-8')
+                  print('changed', path)
+              else:
+                  print('unchanged', path)
+
+          # Games: repair the missing closing anchor around Wordle.
+          edit('games/index.html', lambda s: s.replace(
+              '''        </div>\n\n        <a class="game-card" href="../play/yohohoio/"''',
+              '''        </div>\n      </a>\n\n      <a class="game-card" href="../play/yohohoio/"''', 1))
+
+          # update_games.py: never touch excluded play/ content.
+          def fix_update_script(s):
+              old = 'for file_path in project_dir.rglob("*.html"):\n'
+              new = '''for file_path in project_dir.rglob("*.html"):\n    # Game payloads under play/ are intentionally excluded from metadata rewriting.\n    try:\n        relative_parts = file_path.relative_to(project_dir).parts\n    except ValueError:\n        continue\n    if "play" in relative_parts:\n        continue\n'''
+              return s if 'if "play" in relative_parts' in s else s.replace(old, new, 1)
+          edit('update_games.py', fix_update_script)
+
+          # Settings: profile query errors must not silently render an unusable settings page.
+          def fix_profile(s):
+              old = '      const { data: profile } = await supabase.from("users").select("*").eq("id", user.id).single();\n      const currentBgSetting = (profile && profile.background) ? profile.background : \'default\';'
+              new = '''      const { data: profile, error: profileError } = await supabase.from("users").select("*").eq("id", user.id).single();\n      if (profileError || !profile) {\n        console.error("Failed to load user profile:", profileError);\n        settingsWrapper.innerHTML = '<div class="logged-out-msg"><p>Could not load your account settings. Please refresh and try again.</p></div>';\n        return;\n      }\n      const currentBgSetting = profile.background || 'default';'''
+              return s.replace(old, new, 1)
+          edit('settings/index.html', fix_profile)
+
+          # Settings: paginate storage listing so accounts continue working beyond 1,000 files.
+          def add_avatar_listing(s):
+              marker = "      async function getLatestAvatarPathForUser(userId) {"
+              helper = '''      async function listAllAvatarFiles() {\n        const files = [];\n        const limit = 1000;\n        let offset = 0;\n        while (true) {\n          const { data, error } = await supabase.storage.from('chat-files').list('avatars', {\n            limit,\n            offset,\n            sortBy: { column: 'name', order: 'desc' }\n          });\n          if (error) throw error;\n          if (!data || data.length === 0) break;\n          files.push(...data);\n          if (data.length < limit) break;\n          offset += data.length;\n        }\n        return files;\n      }\n\n'''
+              return s if 'async function listAllAvatarFiles()' in s else s.replace(marker, helper + marker, 1)
+          edit('settings/index.html', add_avatar_listing)
+
+          def replace_avatar_lists(s):
+              # Replace all simple avatar list calls with the paginated helper.
+              pattern = r"const \{ data, error \} = await supabase\.storage\.from\('chat-files'\)\.list\('avatars', \{\n\s*limit: 1000,\n\s*sortBy: \{ column: 'name', order: 'desc' \}\n\s*\}\);"
+              s = re.sub(pattern, "const data = await listAllAvatarFiles();\n        const error = null;", s)
+              pattern2 = r"const \{ data: avatarFiles \} = await supabase\.storage\.from\('chat-files'\)\.list\('avatars', \{\n\s*limit: 1000,\n\s*sortBy: \{ column: 'name', order: 'desc' \}\n\s*\}\);"
+              s = re.sub(pattern2, "const avatarFiles = await listAllAvatarFiles();", s)
+              return s
+          edit('settings/index.html', replace_avatar_lists)
+
+          # Settings: don't destroy the old avatar before the replacement upload succeeds.
+          def fix_avatar_save(s):
+              old = '''          await clearStoredAvatar();\n\n          const storagePath = `avatars/${user.id}.jpg`;'''
+              new = '''          const storagePath = `avatars/${user.id}.jpg`;'''
+              s = s.replace(old, new, 1)
+              old2 = '''          if (uploadError) throw uploadError;\n\n          avatarMsg.textContent = 'Profile picture saved to storage.';'''
+              new2 = '''          if (uploadError) throw uploadError;\n\n          // The new fixed-path avatar is now safely stored; only remove legacy timestamped files.\n          const allAvatarFiles = await listAllAvatarFiles();\n          const legacyAvatarPaths = allAvatarFiles\n            .map(item => item.name)\n            .filter(name => name && name.startsWith(`${user.id}__`))\n            .map(name => `avatars/${name}`);\n          if (legacyAvatarPaths.length) {\n            const { error: cleanupError } = await supabase.storage.from('chat-files').remove(legacyAvatarPaths);\n            if (cleanupError) console.warn('Legacy avatar cleanup failed:', cleanupError);\n          }\n\n          avatarMsg.textContent = 'Profile picture saved to storage.';'''
+              return s.replace(old2, new2, 1)
+          edit('settings/index.html', fix_avatar_save)
+
+          # Settings: revoke old local object URLs when replacing/removing a selected image.
+          def fix_object_urls(s):
+              old = '''        const objectUrl = URL.createObjectURL(file);\n        const img = new Image();'''
+              new = '''        if (avatarState.imageUrl && avatarState.imageUrl.startsWith('blob:')) {\n          URL.revokeObjectURL(avatarState.imageUrl);\n        }\n        const objectUrl = URL.createObjectURL(file);\n        const img = new Image();'''
+              s = s.replace(old, new, 1)
+              old2 = '''          avatarState.image = null;\n          avatarState.imageUrl = '';'''
+              new2 = '''          if (avatarState.imageUrl && avatarState.imageUrl.startsWith('blob:')) {\n            URL.revokeObjectURL(avatarState.imageUrl);\n          }\n          avatarState.image = null;\n          avatarState.imageUrl = '';'''
+              return s.replace(old2, new2, 1)
+          edit('settings/index.html', fix_object_urls)
+
+          # Settings: actually check Supabase update errors and roll the visual theme back on failure.
+          def fix_updates(s):
+              old = '''          await supabase.from("users").update({ username: newUsername }).eq("id", user.id);\n          msgEl.textContent = 'Username updated!';'''
+              new = '''          const { error: usernameError } = await supabase.from("users").update({ username: newUsername }).eq("id", user.id);\n          if (usernameError) throw usernameError;\n          msgEl.textContent = 'Username updated!';'''
+              s = s.replace(old, new, 1)
+              old = '''            window.CarsonGamesTheme.apply(theme.id);\n            await supabase.from("users").update({ background: theme.id }).eq("id", user.id);\n            bgMsg.textContent = "Theme updated!";'''
+              new = '''            window.CarsonGamesTheme.apply(theme.id);\n            const { error: backgroundError } = await supabase.from("users").update({ background: theme.id }).eq("id", user.id);\n            if (backgroundError) throw backgroundError;\n            bgMsg.textContent = "Theme updated!";'''
+              s = s.replace(old, new, 1)
+              old = '''          } catch(err) {\n            bgMsg.textContent = "Error saving theme.";'''
+              new = '''          } catch(err) {\n            window.CarsonGamesTheme.apply(currentBgSetting);\n            document.querySelectorAll('.background-thumb-card').forEach(c => c.classList.toggle('active', c.dataset.id === currentBgSetting));\n            bgMsg.textContent = "Error saving theme.";'''
+              return s.replace(old, new, 1)
+          edit('settings/index.html', fix_updates)
+
+          # Omoggle: do not silently substitute random scoring if the real engine failed to load.
+          def fix_omoggle_fallback(s):
+              old = '''    } catch (e) {\n      console.warn("AuraEngine missing or invalid, using mock fallback.");\n      AuraEngine = {\n        calculateMatchFlux: (score) => {\n          const delta = (Math.random() - 0.5) * 8;\n          return Math.max(0, Math.min(100, score + delta));\n        }\n      };\n    }'''
+              new = '''    } catch (e) {\n      console.error("AuraEngine missing or invalid:", e);\n      AuraEngine = null;\n    }'''
+              s = s.replace(old, new, 1)
+              old = '''    async function startMatchmaking() {\n      if (privateRoomId) return;\n      if (inQueueProcess || !myPeerId) return;'''
+              new = '''    async function startMatchmaking() {\n      if (privateRoomId) return;\n      if (!AuraEngine) {\n        lobbyMsg.innerText = "Omoggle's scoring engine failed to load. Please refresh the page.";\n        return;\n      }\n      if (inQueueProcess || !myPeerId) return;'''
+              s = s.replace(old, new, 1)
+              old = '''      window.location.href = privateRoomId ? "../chat/" : "#";'''
+              new = '''      window.location.href = privateRoomId ? "../omoggle/" : "#";'''
+              return s.replace(old, new, 1)
+          edit('omoggle/index.html', fix_omoggle_fallback)
+
+          # Omoggle: reject stale queue entries during a new search.
+          def fix_queue_cleanup(s):
+              needle = '''      try {\n        const { data: queueItems } = await supabase'''
+              replacement = '''      try {\n        // Remove abandoned waiting rows so old players cannot trap matchmaking.\n        const staleBefore = Date.now() - 2 * 60 * 1000;\n        await supabase.from("showdown_queue").delete().eq("status", "waiting").lt("createdat", staleBefore);\n\n        const { data: queueItems } = await supabase'''
+              return s.replace(needle, replacement, 1)
+          edit('omoggle/index.html', fix_queue_cleanup)
+
+          # AuraEngine: make pixel movement less sensitive to the outer/background region.
+          def fix_motion(s):
+              old = '''    let difference = 0;\n\n    for (\n      let i = 0;\n      i < pixels.length;\n      i += 4\n    ) {'''
+              new = '''    let difference = 0;\n    let weightTotal = 0;\n\n    for (\n      let i = 0;\n      i < pixels.length;\n      i += 4\n    ) {\n      const pixelIndex = i / 4;\n      const x = pixelIndex % width;\n      const y = Math.floor(pixelIndex / width);\n      const nx = (x - width / 2) / (width / 2);\n      const ny = (y - height / 2) / (height / 2);\n      const radius = Math.sqrt(nx * nx + ny * ny);\n      const weight = Math.max(0, 1 - radius);\n      if (weight <= 0) continue;'''
+              s = s.replace(old, new, 1)
+              old = '''      difference +=\n        Math.abs(\n          current -\n          previous\n        ) / 255;\n    }'''
+              new = '''      difference +=\n        (Math.abs(current - previous) / 255) * weight;\n      weightTotal += weight;\n    }'''
+              s = s.replace(old, new, 1)
+              old = '''    const pixelCount =\n      pixels.length / 4;\n\n    const movement =\n      difference /\n      pixelCount;'''
+              new = '''    const movement =\n      weightTotal > 0\n        ? difference / weightTotal\n        : 0;'''
+              return s.replace(old, new, 1)
+          edit('omoggle/auraEngine.js', fix_motion)
+          PY
+
+      - name: Commit audited fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add games/index.html update_games.py settings/index.html omoggle/index.html omoggle/auraEngine.js
+          if git diff --cached --quiet; then
+            echo "No additional changes were needed."
+            exit 0
+          fi
+          git commit -m "chore: apply audited fixes"
+          git push
