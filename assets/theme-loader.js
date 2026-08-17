@@ -9,49 +9,30 @@
   const clearThemeClasses = (element) => {
     if (!element) return;
     for (const className of Array.from(element.classList)) {
-      if (className.startsWith(THEME_PREFIX)) {
-        element.classList.remove(className);
-      }
+      if (className.startsWith(THEME_PREFIX)) element.classList.remove(className);
     }
   };
 
   const applyThemeToElement = (element, themeName) => {
     if (!element) return;
     clearThemeClasses(element);
-    if (themeName && themeName !== 'default') {
-      element.classList.add(`${THEME_PREFIX}${themeName}`);
-    }
+    if (themeName && themeName !== 'default') element.classList.add(`${THEME_PREFIX}${themeName}`);
   };
 
   const applyTheme = (themeName) => {
     applyThemeToElement(document.documentElement, themeName);
-
     if (document.body) {
       applyThemeToElement(document.body, themeName);
     } else {
-      document.addEventListener(
-        'DOMContentLoaded',
-        () => applyThemeToElement(document.body, themeName),
-        { once: true }
-      );
+      document.addEventListener('DOMContentLoaded', () => applyThemeToElement(document.body, themeName), { once: true });
     }
   };
 
-  const syncStoredTheme = () => {
-    const themeName = localStorage.getItem('carson_theme') || 'default';
-    applyTheme(themeName);
-  };
+  const syncStoredTheme = () => applyTheme(localStorage.getItem('carson_theme') || 'default');
 
   const applySiteMeta = (meta) => {
-    const resolvedMeta = {
-      ...DEFAULT_SITE_META,
-      ...(meta || {}),
-    };
-
-    if (resolvedMeta.title) {
-      document.title = resolvedMeta.title;
-    }
-
+    const resolvedMeta = { ...DEFAULT_SITE_META, ...(meta || {}) };
+    if (resolvedMeta.title) document.title = resolvedMeta.title;
     if (resolvedMeta.favicon) {
       let faviconLink = document.querySelector('link[rel="icon"]');
       if (!faviconLink) {
@@ -60,7 +41,8 @@
         document.head.appendChild(faviconLink);
       }
       faviconLink.setAttribute('href', resolvedMeta.favicon);
-      faviconLink.setAttribute('type', 'image/svg+xml');
+      // Do not claim every favicon is SVG. Let the browser determine the type from the resource.
+      faviconLink.removeAttribute('type');
     }
   };
 
@@ -68,8 +50,7 @@
     try {
       const response = await fetch(SITE_META_URL, { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const meta = await response.json();
-      applySiteMeta(meta);
+      applySiteMeta(await response.json());
     } catch (error) {
       applySiteMeta(DEFAULT_SITE_META);
     }
@@ -88,8 +69,6 @@
   syncSiteMeta();
 
   window.addEventListener('storage', (event) => {
-    if (event.key === 'carson_theme') {
-      applyTheme(event.newValue || 'default');
-    }
+    if (event.key === 'carson_theme') applyTheme(event.newValue || 'default');
   });
 })();
