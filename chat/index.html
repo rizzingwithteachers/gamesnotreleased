@@ -1,0 +1,3409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Dashboard | RapidIdentity</title>
+  <script src="../assets/theme-loader.js"></script>
+  <script src="peerjs.min.js"></script>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── THEME CONFIGURATION ──────────────────────────────── */
+    :root {
+      --vh: 1vh;
+      --bg: #06060c;
+      --surface: #0c0d19;
+      --card: #121426;
+      --card-hover: #181b33;
+      --border: rgba(255, 255, 255, 0.06);
+      --border-focus: rgba(124, 58, 237, 0.4);
+      --text: #f1f5f9;
+      --text-muted: #64748b;
+      --accent: #6c63ff;
+      --accent-glow: rgba(108, 99, 255, 0.25);
+      --accent-blue: #3b82f6;
+      --radius-m: 8px;
+      --radius-l: 14px;
+      --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+      --font-display: 'Outfit', system-ui, sans-serif;
+      --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* ── BASE RESET ───────────────────────────────────────── */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: var(--font);
+    }
+
+    b, strong {
+      font-weight: 700 !important;
+      -webkit-text-fill-color: currentColor;
+      color: inherit;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    html {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden !important;
+    }
+
+    body {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: auto;
+      width: 100%;
+      height: calc(var(--vh) * 100);
+      min-height: 0 !important;
+      display: flex;
+      flex-direction: column;
+      overscroll-behavior: none;
+    }
+
+    /* iOS Safari keyboard viewport handling. The root page is locked in
+       place; JavaScript resizes/repositions the fixed body to the actual
+       visual viewport instead of allowing Safari to pan the whole document. */
+    html.keyboard-open,
+    body.keyboard-open {
+      overflow: hidden !important;
+      overscroll-behavior: none !important;
+    }
+
+    body.keyboard-open .input-container {
+      padding-bottom: 0 !important;
+      position: relative;
+      top: 6px;
+    }
+
+    header {
+      background: rgba(12, 13, 25, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      position: relative;
+      width: 100%;
+      z-index: 999;
+      flex-shrink: 0;
+      height: 72px;
+    }
+
+    .nav-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+    }
+
+    .logo {
+      font-family: var(--font-display) !important;
+      font-size: 1.5rem !important;
+      font-weight: 800 !important;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #fff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-decoration: none;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 1.5rem;
+    }
+
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-family: var(--font-display) !important;
+      font-weight: 700 !important;
+      font-size: 0.95rem;
+      padding: 6px 12px;
+      border-radius: var(--radius-m);
+      transition: all 0.3s var(--ease);
+      position: relative;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.3s var(--ease);
+    }
+
+    nav a.active {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    @media (hover: hover) {
+      nav a:hover {
+        color: var(--text);
+        background: rgba(255, 255, 255, 0.04);
+      }
+      nav a:hover::after {
+        width: 100%;
+      }
+      .nav-auth-btn:hover {
+        transform: translateY(-2px) scale(1.08);
+        box-shadow: 0 8px 24px rgba(108, 99, 255, 0.5);
+        background: rgba(108, 99, 255, 0.95) !important;
+      }
+      .nav-auth-btn:hover::before {
+        left: 100%;
+      }
+      .btn-primary:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 32px rgba(108, 99, 255, 0.5);
+      }
+      .btn-primary:hover::before {
+        left: 100%;
+      }
+      .vc-control-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent);
+      }
+      .vc-control-btn:hover img {
+        filter: brightness(1.2);
+      }
+      .vc-leave-btn:hover {
+        background: #dc2626 !important;
+        border-color: rgba(220, 38, 38, 0.5) !important;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+      }
+      .action-control-btn:hover {
+        color: var(--text);
+        border-color: var(--text-muted);
+      }
+      .action-control-btn.btn-delete-msg:hover {
+        background: rgba(239, 68, 68, 0.15);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.4);
+      }
+      .action-control-btn:hover .tray-icon-img {
+        opacity: 1;
+      }
+      .btn-upload-file:hover {
+        background: #35373c;
+        border-color: rgba(255, 255, 255, 0.25);
+      }
+      .btn-upload-file:hover svg {
+        color: #ffffff;
+      }
+      .suggestion-item:hover {
+        background: var(--card-hover);
+        color: #fff;
+      }
+      .btn-duel-accept:hover {
+        background: #059669;
+      }
+      .btn-duel-decline:hover {
+        background: #dc2626;
+      }
+    }
+
+    .nav-auth-btn {
+      background: var(--accent);
+      color: #fff !important;
+      padding: 8px 18px !important;
+      border-radius: 999px !important;
+      font-family: var(--font-display) !important;
+      font-weight: 700 !important;
+      font-size: 0.85rem !important;
+      text-decoration: none !important;
+      display: inline-block;
+      transition: all 0.3s var(--ease);
+      box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-auth-btn::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 22px;
+      border: none;
+      border-radius: var(--radius-m);
+      font-family: var(--font-display) !important;
+      font-weight: 700 !important;
+      cursor: pointer;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      transition: all 0.3s var(--ease);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+
+    /* ── VOICE/VIDEO CHAT DOCK ────────────────────────────── */
+    #vc-dock-container {
+      display: none;
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      height: 320px;
+      min-height: 240px;
+      max-height: 340px;
+      overflow: hidden;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      animation: slideDown 0.3s var(--ease);
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .vc-dock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+    }
+
+    .vc-room-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .vc-room-title {
+      font-family: var(--font-display) !important;
+      font-size: 1.1rem;
+      font-weight: 800 !important;
+      color: var(--text);
+    }
+
+    .vc-participant-count {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      background: rgba(108, 99, 255, 0.1);
+      padding: 3px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(108, 99, 255, 0.2);
+      font-weight: 600;
+    }
+
+    .vc-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .vc-control-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-m);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s var(--ease);
+      padding: 0;
+    }
+
+    .vc-control-btn img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      filter: brightness(0.9);
+      transition: filter 0.2s var(--ease);
+    }
+
+    .vc-leave-btn {
+      background: #ef4444 !important;
+      border-color: rgba(239, 68, 68, 0.3) !important;
+    }
+
+    .vc-leave-btn img {
+      filter: brightness(1) !important;
+    }
+
+    #vc-participant-grid {
+      display: grid;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      height: calc(100% - 64px);
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+
+    #vc-participant-grid.count-1 { grid-template-columns: 1fr; grid-template-rows: 1fr; }
+    #vc-participant-grid.count-2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr; }
+    #vc-participant-grid.count-3 { grid-template-columns: 7fr 3fr; grid-template-rows: 1fr; }
+
+    #vc-participant-grid.count-3 .vc-tile.focus-tile { grid-column: 1; grid-row: 1; }
+    #vc-participant-grid.count-3 .vc-tile:not(.focus-tile) { grid-column: 2; grid-row: 1; height: 50%; }
+    #vc-participant-grid.count-3 .vc-tile:not(.focus-tile):first-of-type { margin-bottom: 0.375rem; }
+    #vc-participant-grid.count-3 .vc-tile:not(.focus-tile):last-of-type { margin-top: 0.375rem; }
+
+    #vc-participant-grid.count-4 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+    #vc-participant-grid.count-5plus { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); grid-auto-rows: 180px; }
+
+    .vc-tile {
+      position: relative;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-l);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.3s var(--ease), box-shadow 0.3s var(--ease);
+      min-height: 0;
+    }
+
+    .vc-tile.is-speaking {
+      border: 2px solid var(--accent) !important;
+      box-shadow: 0 0 12px var(--accent-glow), 0 0 24px rgba(108, 99, 255, 0.15);
+    }
+
+    .vc-tile video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background: var(--card);
+      display: block;
+    }
+
+    .vc-tile video.is-hidden { display: none; }
+
+    .vc-avatar-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--card);
+      border: 2px solid var(--border);
+      object-fit: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display) !important;
+      font-weight: 800 !important;
+      font-size: 1.5rem;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+
+    .vc-avatar-img.is-hidden { display: none; }
+
+    .vc-tile-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 0.75rem;
+      pointer-events: none;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+    }
+
+    .vc-tile-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .vc-username {
+      font-family: var(--font-display) !important;
+      font-size: 0.9rem;
+      font-weight: 800 !important;
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    .vc-status-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+
+    .vc-status-badge img {
+      width: 12px;
+      height: 12px;
+      object-fit: contain;
+      filter: brightness(1.1);
+    }
+
+    .vc-local-badge {
+      font-family: var(--font-display) !important;
+      font-size: 0.7rem;
+      font-weight: 800 !important;
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 99px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 6px rgba(108, 99, 255, 0.4);
+    }
+
+    /* ── LAYOUT MECHANICS ─────────────────────────────────── */
+    .chat-layout {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .chat-main {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      overflow: hidden;
+      position: relative;
+      height: 100%;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0.95rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .chat-meta { display: flex; align-items: center; gap: 0.75rem; }
+    .channel-title { font-family: var(--font-display) !important; font-size: 1.15rem; font-weight: 800 !important; display: flex; align-items: center; gap: 0.5rem; -webkit-text-fill-color: currentColor; }
+    .channel-title strong, .channel-title b { font-weight: 800 !important; -webkit-text-fill-color: currentColor; }
+
+    .message-scroller {
+      flex: 1;
+      padding: 1.4rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      touch-action: pan-y;
+    }
+
+    .msg-block { display: flex; gap: 1rem; align-items: flex-start; transition: opacity 0.2s ease; position: relative; }
+    .msg-block.pending { opacity: 0.4; filter: brightness(0.8); }
+
+    .msg-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--card); flex-shrink: 0; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--accent); font-family: var(--font-display) !important; font-weight: 800 !important; overflow: hidden; }
+    .msg-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .msg-content { width: 100%; padding-right: 80px; }
+    .msg-top { display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 0.35rem; }
+    .msg-content h5 { font-family: var(--font-display) !important; font-size: 1.05rem; font-weight: 800 !important; margin: 0; color: var(--text); -webkit-text-fill-color: currentColor; }
+    .msg-content h5 span { font-family: var(--font); font-size: 0.78rem; color: var(--text-muted); margin-left: 8px; font-weight: 500; -webkit-text-fill-color: currentColor; }
+    .msg-content p { color: #f1f5f9; font-size: 1.05rem; font-weight: 600; line-height: 1.6; margin: 0; -webkit-text-fill-color: currentColor; }
+    .msg-content p b, .msg-content p strong { font-weight: 700 !important; -webkit-text-fill-color: currentColor; color: inherit; }
+
+    .msg-controls-tray { position: absolute; right: 10px; top: 12px; display: flex; gap: 8px; align-items: center; }
+
+    .action-control-btn { background: var(--surface); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+    .action-control-btn.btn-delete-msg:hover { background: rgba(239, 68, 68, 0.15); color: #ef4444; border-color: rgba(239, 68, 68, 0.4); }
+
+    .tray-icon-img { width: 14px; height: 14px; object-fit: contain; pointer-events: none; opacity: 0.8; transition: opacity 0.2s var(--ease); }
+    .action-control-btn:hover .tray-icon-img { opacity: 1; }
+
+    .badge-admin { color: #3b82f6; font-size: 0.72rem; background: rgba(59,130,246,0.12); padding: 2px 6px; border-radius: 99px; font-weight: 700; border: 1px solid rgba(59,130,246,0.2); text-transform: uppercase; margin-left: 4px; -webkit-text-fill-color: currentColor; }
+    .badge-owner { color: #f59e0b; font-size: 0.72rem; background: rgba(245,158,11,0.12); padding: 2px 6px; border-radius: 99px; font-weight: 700; border: 1px solid rgba(245,158,11,0.2); text-transform: uppercase; margin-left: 4px; -webkit-text-fill-color: currentColor; }
+
+    .duel-card { background: var(--surface); border: 1px solid rgba(108, 99, 255, 0.2); border-radius: var(--radius-m); padding: 1rem; margin-top: 0.6rem; display: flex; flex-direction: column; gap: 0.75rem; max-width: 440px; }
+    .duel-card-msg { font-size: 0.95rem; color: #cbd5e1; font-weight: 600; -webkit-text-fill-color: currentColor; }
+    .duel-card-actions { display: flex; gap: 8px; }
+
+    .btn-duel-accept { background: #10b981; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-family: var(--font-display) !important; font-weight: 800 !important; font-size: 0.85rem; cursor: pointer; transition: background 0.2s ease; -webkit-text-fill-color: currentColor; }
+    .btn-duel-accept:disabled { background: #065f46; cursor: not-allowed; opacity: 0.6; }
+    
+    .btn-duel-decline { background: #ef4444; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-family: var(--font-display) !important; font-weight: 800 !important; font-size: 0.85rem; cursor: pointer; transition: background 0.2s ease; -webkit-text-fill-color: currentColor; }
+    .btn-duel-decline:disabled { background: #991b1b; cursor: not-allowed; opacity: 0.6; }
+
+    .input-container {
+      padding: 0 1.5rem 1.5rem;
+      padding-bottom: max(1.5rem, calc(1.5rem + env(safe-area-inset-bottom, 0px)));
+      position: relative;
+      flex-shrink: 0;
+    }
+    .input-row { display: flex; gap: 0.75rem; align-items: center; }
+
+    .input-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-upload-file {
+      position: absolute;
+      left: 10px;
+      z-index: 2;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #2b2d31;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-upload-file svg {
+      width: 16px;
+      height: 16px;
+      color: #b5bac1;
+      transition: color 0.2s ease;
+    }
+
+    .input-container .input-field {
+      width: 100%;
+      background: var(--surface);
+      padding: 12px 16px 12px 52px;
+      border-radius: var(--radius-m);
+      border: 1px solid var(--border);
+      color: var(--text);
+      outline: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: all 0.3s var(--ease);
+      touch-action: manipulation;
+    }
+
+    .input-container .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow), 0 0 20px rgba(108, 99, 255, 0.2);
+    }
+
+    .send-btn { min-width: 130px; }
+
+    .cooldown-text {
+      color: #64748b;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      padding-left: 1rem;
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .send-btn:disabled {
+      opacity: 0.4 !important;
+      filter: brightness(0.5) !important;
+      pointer-events: none !important;
+      cursor: not-allowed !important;
+      box-shadow: none !important;
+      transform: none !important;
+      transition: none !important;
+    }
+
+    /* ── SUGGESTIONS POPOVER POSITION & Z-INDEX FIX ─────────── */
+    .suggestions-popover {
+      position: absolute;
+      bottom: 100%;
+      left: 1.5rem;
+      right: 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 -8px 24px rgba(0,0,0,0.6);
+      max-height: 240px;
+      min-height: 80px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      padding: 6px 0;
+      overscroll-behavior: contain;
+      margin-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+    }
+
+    .suggestion-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      color: #cbd5e1;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.15s ease;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-text-fill-color: currentColor;
+    }
+    .suggestion-item strong, .suggestion-item b {
+      font-weight: 700 !important;
+      -webkit-text-fill-color: currentColor;
+    }
+    .suggestion-item.selected {
+      background: var(--card-hover);
+      color: #fff;
+    }
+    .suggestion-item .item-icon { font-weight: bold; color: #a855f7; -webkit-text-fill-color: currentColor; }
+    .suggestion-item .item-avatar { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; color: #fff; overflow: hidden; }
+    .suggestion-item .item-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes slideInLeft { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
+    @keyframes slideInRight { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    header { animation: slideInLeft 600ms var(--ease) both; }
+    .chat-layout { animation: fadeUp 480ms var(--ease) both; }
+    .chat-main { animation: slideInRight 500ms var(--ease) both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      header, .chat-layout, .chat-main, .cooldown-text { animation: none !important; }
+    }
+
+    @media (max-width: 768px) {
+      #vc-participant-grid.count-2 { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+      #vc-participant-grid.count-3 { grid-template-columns: 1fr; grid-template-rows: 2fr 1fr 1fr; }
+      #vc-participant-grid.count-3 .vc-tile.focus-tile { grid-column: 1; grid-row: 1; }
+      #vc-participant-grid.count-3 .vc-tile:not(.focus-tile) { grid-column: 1; }
+      #vc-participant-grid.count-3 .vc-tile:not(.focus-tile):first-of-type { grid-row: 2; }
+      #vc-participant-grid.count-3 .vc-tile:not(.focus-tile):last-of-type { grid-row: 3; }
+      #vc-participant-grid.count-4 { grid-template-columns: 1fr; grid-template-rows: repeat(4, 1fr); }
+    }
+  </style>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <header>
+    <div class="nav-container">
+      <a href="../" class="logo">CarsonGames</a>
+      <nav>
+        <ul>
+          <li><a href="../">Home</a></li>
+          <li><a href="../games/">Games</a></li>
+          <li><a href="../omoggle/">Omoggle</a></li>
+          <li><a href="#" class="active">Chat</a></li>
+          <li><a href="../settings/">Settings</a></li>
+          <li id="auth-button-container"></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div id="vc-dock-container">
+    <div class="vc-dock-header">
+      <div class="vc-room-info">
+        <div class="vc-room-title">General VC</div>
+        <div class="vc-participant-count" id="vc-participant-count">0 participants</div>
+      </div>
+      <div class="vc-controls">
+        <button class="vc-control-btn" id="vc-mic-btn" title="Toggle Microphone">
+          <img src="../assets/chat-vc-mic-unmuted.svg" alt="Mic">
+        </button>
+        <button class="vc-control-btn" id="vc-camera-btn" title="Toggle Camera">
+          <img src="../assets/chat-vc-camera-disabled.svg" alt="Camera">
+        </button>
+        <button class="vc-control-btn" id="vc-flip-btn" title="Flip Camera">
+          <img src="../assets/chat-flipcamera.svg" alt="Flip Camera">
+        </button>
+        <button class="vc-control-btn" id="vc-screenshare-btn" title="Share Screen">
+          <img src="../assets/chat-vc-screenshare.svg" alt="Screen Share">
+        </button>
+        <button class="vc-control-btn vc-leave-btn" id="vc-leave-btn" title="Leave Voice Room">
+          <img src="../assets/chat-vc-leave.svg" alt="Leave">
+        </button>
+      </div>
+    </div>
+    <div id="vc-participant-grid"></div>
+  </div>
+
+  <main class="chat-layout" id="chat-layout">
+    <section class="chat-main">
+      <div class="chat-header">
+        <div class="chat-meta">
+          <div class="channel-title"><span></span><strong>Carson Chat</strong></div>
+        </div>
+      </div>
+
+      <div class="message-scroller" id="message-scroller"></div>
+
+      <div class="input-container">
+        <div id="suggestions-popover" class="suggestions-popover"></div>
+        <div id="cooldown-timer-text" class="cooldown-text"></div>
+
+        <div class="input-row">
+          <input type="file" id="file-input" style="display: none;" />
+          <div class="input-wrapper">
+            <button id="upload-btn" class="btn-upload-file" title="Attach File" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+            <input id="message-input" type="text" class="input-field" placeholder="Type a message or / for a command..." autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send">
+          </div>
+          <button id="send-message-btn" class="btn-primary send-btn">Send</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+/* SUPABASE CONFIG */
+const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
+const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+/* ── iOS VISUAL VIEWPORT & KEYBOARD FIXES ─────────────── */
+function updateLayoutDimensions() {
+  // iOS Safari has separate layout and visual viewports. When the keyboard
+  // opens, size the fixed chat page to the visual viewport and keep its
+  // origin aligned with that viewport instead of letting Safari pan the page.
+  const vv = window.visualViewport;
+  const viewportHeight = vv ? vv.height : window.innerHeight;
+  const viewportWidth = vv ? vv.width : window.innerWidth;
+  const viewportTop = vv ? vv.offsetTop : 0;
+  const viewportLeft = vv ? vv.offsetLeft : 0;
+
+  const vh = viewportHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+  document.documentElement.style.setProperty('--visual-viewport-height', `${viewportHeight}px`);
+  document.documentElement.style.setProperty('--visual-viewport-top', `${viewportTop}px`);
+
+  const keyboardHeight = vv
+    ? Math.max(0, window.innerHeight - viewportHeight)
+    : 0;
+  document.documentElement.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+
+  const activeElement = document.activeElement;
+  const isTextInput = activeElement && (
+    activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA'
+  );
+  const keyboardOpen = isTextInput && viewportHeight < window.innerHeight - 150;
+  document.documentElement.classList.toggle('keyboard-open', keyboardOpen);
+  document.body.classList.toggle('keyboard-open', keyboardOpen);
+
+  // Explicitly size and position the fixed body to the visual viewport.
+  // This is more reliable on iPadOS than window.scrollTo(), which can race
+  // with Safari's own keyboard panning and leave a blank/black page behind.
+  document.body.style.height = `${viewportHeight}px`;
+  document.body.style.width = `${viewportWidth}px`;
+  document.body.style.top = `${viewportTop}px`;
+  document.body.style.left = `${viewportLeft}px`;
+
+  // Keep the root scrolling element at its origin. The message scroller is
+  // the only element that should scroll while the keyboard is visible.
+  if (document.scrollingElement) {
+    document.scrollingElement.scrollTop = 0;
+    document.scrollingElement.scrollLeft = 0;
+  }
+
+  const popover = document.getElementById('suggestions-popover');
+  if (popover && popover.style.display === 'block') {
+    const inputContainer = document.querySelector('.input-container');
+    if (inputContainer) {
+      const inputRect = inputContainer.getBoundingClientRect();
+      const availableSpace = inputRect.top - 72 - 10;
+      const minPopoverHeight = 80;
+      const maxPopoverHeight = 240;
+      if (availableSpace < maxPopoverHeight) {
+        popover.style.maxHeight = `${Math.max(availableSpace, minPopoverHeight)}px`;
+      } else {
+        popover.style.maxHeight = `${maxPopoverHeight}px`;
+      }
+    }
+  }
+}
+
+const EX_COMMANDS = [
+  { name: "/admin", desc: "Promote a user to Admin {/admin @user}" },
+  { name: "/ban", desc: "Ban a user for a duration {/ban @user time reason}" },
+  { name: "/deleteall", desc: "Wipe all chat messages and whispers {/deleteall}" },
+  { name: "/deleteuser", desc: "Delete a user from the database {/deleteuser @user}" },
+  { name: "/kick", desc: "Kick a user from chat for 2 minutes {/kick @user reason}" },
+  { name: "/mute", desc: "Mute a user for a duration {/mute @user time}" },
+  { name: "/omoggle", desc: "Send an Omoggle video match challenge {/omoggle @user}" },
+  { name: "/owner", desc: "Promote an Admin to Owner {/owner @user}" },
+  { name: "/permaban", desc: "Permanently ban a user {/permaban @user reason}" },
+  { name: "/privatevc", desc: "Start a private voice chat {/privatevc @user1 @user2}" },
+  { name: "/publicvc", desc: "Start a public voice chat {/publicvc}" },
+  { name: "/subscription", desc: "Modify user subscription status {/subscription @user basic/premium}" },
+  { name: "/unadmin", desc: "Demote an Admin to User {/unadmin @user}" },
+  { name: "/unban", desc: "Unban a user {/unban @user}" },
+  { name: "/undo", desc: "Undo your last message deletion/edit {/undo}" },
+  { name: "/unmute", desc: "Unmute a user {/unmute @user}" },
+  { name: "/unowner", desc: "Demote an Owner to Admin {/unowner @user}" },
+  { name: "/w", desc: "Whisper privately to a user {/w @user message}" },
+  { name: "/warn", desc: "Issue a formal warning to a user {/warn @user reason}" },
+  { name: "/whisper", desc: "Whisper privately to a user {/whisper @user message}" }
+].sort((a, b) => a.name.localeCompare(b.name));
+
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+let currentUser = null;
+let currentUsername = "User";
+let currentUserRole = "user";
+let currentUserMutedUntil = 0;
+let currentUserBannedUntil = 0;
+let currentUserBanReason = "";
+
+let lastMessageTime = 0;
+const MESSAGE_COOLDOWN = 2000;
+let historyPageOffset = 0;
+let isLoadingMore = false;
+let initialSnapshotReceived = false;
+let isFirstLoad = true;
+
+let dbPublicMessages = [];
+let dbPrivateMessages = [];
+let dbHistoricalMessages = [];
+let localPendingQueue = [];
+
+let allRegisteredUsers = [];
+let localUsersCache = [];
+
+let activeSuggestionIndex = 0;
+let currentMentionTriggerIdx = -1;
+let currentMentionType = "";
+
+let isEditingMode = false;
+let editingMessageId = null;
+let editingCollectionTarget = "messages";
+let allMessagesLoaded = false;
+
+let lastActionLog = null;
+let activeMuteInterval = null;
+let ephemeralSystemMessages = [];
+let processedOmoggleRedirects = new Set();
+
+let publicChannel = null;
+let privateChannel = null;
+let userProfileChannel = null;
+let avatarIndexByUserId = new Map();
+
+/* ── VOICE/VIDEO CHAT STATE ───────────────────────────────── */
+let vcParticipants = new Map();
+let vcLocalState = {
+  isMuted: false,
+  isCameraOn: true,
+  isScreenSharing: false,
+  isSpeaking: false,
+  currentFacingMode: 'user'
+};
+let vcActiveRoomId = null;
+
+/* ── PEERJS VOICE/VIDEO STATE ─────────────────────────────── */
+let vcPeer = null;
+let vcPeerId = null;
+let vcLocalStream = null;
+let vcScreenStream = null;
+let vcCalls = new Map();
+let vcRemoteStreams = new Map();
+let vcRealtimeChannel = null;
+
+/* HELPER TIMEOUT FOR ALL DURATION STRINGS */
+function parseDurationString(str) {
+  if (!str) return null;
+  const match = str.trim().match(/^(\d+)(s|m|h|d|w|mo|y)$/i);
+  if (!match) return null;
+
+  const value = parseInt(match[1], 10);
+  const unit = match[2].toLowerCase();
+
+  switch (unit) {
+    case 's': return value * 1000;
+    case 'm': return value * 60 * 1000;
+    case 'h': return value * 60 * 60 * 1000;
+    case 'd': return value * 24 * 60 * 60 * 1000;
+    case 'w': return value * 7 * 24 * 60 * 60 * 1000;
+    case 'mo': return value * 30 * 24 * 60 * 60 * 1000;
+    case 'y': return value * 365 * 24 * 60 * 60 * 1000;
+    default: return null;
+  }
+}
+
+/* CONNECTION FAILSAFE TIMEOUT */
+setTimeout(() => {
+  if (currentUser && !initialSnapshotReceived) {
+    if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) return;
+    console.warn("Failsafe triggered: Chat channel frozen. Forcing reload...");
+    window.location.reload();
+  }
+}, 2000);
+
+/* AUTH CHECK & SYNC USER ROLES / MUTE STATE */
+supabase.auth.onAuthStateChange(async (event, session) => {
+  const user = session?.user || null;
+  if (!user) {
+    currentUser = null;
+    currentUsername = "User";
+    currentUserRole = "user";
+    currentUserMutedUntil = 0;
+    currentUserBannedUntil = 0;
+    currentUserBanReason = "";
+    updateAuthButtonState(false);
+    window.location.replace("../login/");
+    return;
+  }
+
+  currentUser = user;
+  currentUsername = user.email ? user.email.split("@")[0] : "User";
+
+  const { data: profile, error } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (error || !profile) {
+    await supabase.from("users").insert({
+      id: user.id,
+      username: currentUsername,
+      email: user.email,
+      role: "user",
+      rank: "none",
+      createdAt: Date.now()
+    });
+  } else {
+    currentUsername = profile.username || currentUsername;
+    currentUserRole = profile.role || "user";
+    currentUserMutedUntil = profile.mutedUntil || 0;
+    currentUserBannedUntil = profile.bannedUntil || 0;
+    currentUserBanReason = profile.banReason || "";
+  }
+
+  if (userProfileChannel) userProfileChannel.unsubscribe();
+  userProfileChannel = supabase
+    .channel(`public:users:id=eq.${user.id}`)
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${user.id}` }, payload => {
+      const data = payload.new;
+      const oldBannedUntil = currentUserBannedUntil;
+      const oldMutedUntil = currentUserMutedUntil;
+      
+      currentUsername = data.username || currentUsername;
+      currentUserRole = data.role || "user";
+      currentUserMutedUntil = data.mutedUntil || 0;
+      currentUserBannedUntil = data.bannedUntil || 0;
+      currentUserBanReason = data.banReason || "";
+
+      const cachedUser = allRegisteredUsers.find(item => item.id === user.id) || localUsersCache.find(item => item.id === user.id);
+      if (cachedUser) {
+        cachedUser.username = data.username || cachedUser.username;
+        cachedUser.role = data.role || "user";
+      }
+
+      if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) {
+        handleBannedUserDisplay();
+      } else {
+        if (currentUserMutedUntil && Date.now() < currentUserMutedUntil) {
+          if (oldMutedUntil !== currentUserMutedUntil) {
+             startCooldownTimer(currentUserMutedUntil);
+          }
+        } else if (activeMuteInterval && (!currentUserMutedUntil || currentUserMutedUntil <= Date.now())) {
+          clearInterval(activeMuteInterval);
+          activeMuteInterval = null;
+          const btn = document.getElementById("send-message-btn");
+          const textContainer = document.getElementById("cooldown-timer-text");
+          if (btn) btn.disabled = false;
+          if (textContainer) {
+            textContainer.style.display = "none";
+            textContainer.textContent = "";
+          }
+        }
+        
+        if (oldBannedUntil && oldBannedUntil > Date.now() && (!currentUserBannedUntil || currentUserBannedUntil <= Date.now())) {
+          const inputRow = document.querySelector(".input-row");
+          const inputField = document.getElementById("message-input");
+          const sendBtn = document.getElementById("send-message-btn");
+          
+          if (inputRow) inputRow.style.display = "flex";
+          if (inputField) inputField.disabled = false;
+          if (sendBtn) sendBtn.disabled = false;
+        }
+        renderMessages();
+      }
+    })
+    .subscribe();
+
+  if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) {
+    handleBannedUserDisplay();
+  }
+
+  updateAuthButtonState(true);
+  await startChat(user);
+});
+
+function handleBannedUserDisplay() {
+  const scroller = document.getElementById("message-scroller");
+  const inputRow = document.querySelector(".input-row");
+  const inputField = document.getElementById("message-input");
+  const sendBtn = document.getElementById("send-message-btn");
+  
+  if(inputRow) inputRow.style.display = "none";
+  if(inputField) inputField.disabled = true;
+  if(sendBtn) sendBtn.disabled = true;
+
+  if(scroller) {
+    let textSummaryString = "";
+    const deltaMs = currentUserBannedUntil - Date.now();
+
+    if (deltaMs > 10 * 365 * 24 * 60 * 60 * 1000) {
+      textSummaryString = "You are permanently banned.";
+    } else {
+      const parsedTotalMinutes = Math.ceil(deltaMs / (60 * 1000));
+      const hoursLeft = Math.floor(parsedTotalMinutes / 60);
+      const minutesLeft = parsedTotalMinutes % 60;
+      const secondsLeft = Math.floor((deltaMs % (60 * 1000)) / 1000);
+
+      let segments = [];
+      if (hoursLeft > 0) segments.push(`${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''}`);
+      if (minutesLeft > 0) segments.push(`${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}`);
+      if (segments.length === 0 && secondsLeft > 0) segments.push(`${secondsLeft} second${secondsLeft !== 1 ? 's' : ''}`);
+
+      textSummaryString = `You are banned for ${segments.length > 0 ? segments.join(", ") : "a few seconds"}.`;
+    }
+
+    const reasonString = currentUserBanReason || "No explicit reason logged.";
+
+    scroller.innerHTML = `
+      <div style="text-align: center; font-family: var(--font-display); padding: 4rem 1rem; width: 100%;">
+        <div style="color: #ef4444; font-size: 1.35rem; font-weight: 800; margin-bottom: 0.6rem; letter-spacing: -0.5px;">${textSummaryString}</div>
+        <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 600; margin-bottom: 0.8rem;">Reason: ${escapeHtml(reasonString)}</div>
+        <div style="color: var(--text-muted); font-size: 0.95rem; font-weight: 600;">Ask an admin if you think this is a mistake.</div>
+      </div>
+    `;
+  }
+}
+
+async function loadAndCacheAllUsers() {
+  try {
+    const { data: usersData } = await supabase.from("users").select("*");
+    if (usersData) {
+      allRegisteredUsers = usersData.map(u => ({
+        id: u.id,
+        username: u.username || "User",
+        email: u.email || "N/A",
+        role: u.role || "user",
+        rank: u.rank || "none",
+        createdAt: u.createdAt || 0,
+        avatar: u.username ? u.username[0].toUpperCase() : "U"
+      }));
+      localUsersCache = allRegisteredUsers;
+    }
+  } catch (err) {
+    console.error("Failed to compile master user profile storage parameters:", err);
+  }
+}
+
+async function loadAvatarIndex() {
+  avatarIndexByUserId = new Map();
+
+  try {
+    const { data, error } = await supabase.storage.from("chat-files").list("avatars", {
+      limit: 1000,
+      sortBy: { column: "name", order: "desc" }
+    });
+
+    if (error || !data) return;
+
+    const latestByUser = new Map();
+
+    data.forEach(item => {
+      if (!item.name) return;
+      const match = item.name.match(/^(.+?)__(\d+)\.(jpg|jpeg|png|webp)$/i);
+      if (!match) return;
+
+      const userId = match[1];
+      const timestamp = parseInt(match[2], 10) || 0;
+      const existing = latestByUser.get(userId);
+
+      if (!existing || timestamp > existing.timestamp) {
+        latestByUser.set(userId, {
+          fileName: item.name,
+          timestamp
+        });
+      }
+    });
+
+    avatarIndexByUserId = latestByUser;
+  } catch (err) {
+    console.error("Failed to load avatar storage index:", err);
+    avatarIndexByUserId = new Map();
+  }
+}
+
+function clearEphemeralSystemMessages() {
+  ephemeralSystemMessages = [];
+}
+
+function showLocalSystemMessage(text, isError = false) {
+  ephemeralSystemMessages.push({
+    id: `system-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    text,
+    isError,
+    isSystemMessage: true,
+    username: "Server",
+    timestamp: new Date().toISOString()
+  });
+  renderMessages(true);
+}
+
+function updateAuthButtonState(isLoggedIn) {
+  const container = document.getElementById('auth-button-container');
+  if (!container) return;
+
+  if (isLoggedIn) {
+    container.innerHTML = '<a id="logout-btn" href="#" class="nav-auth-btn">Logout</a>';
+    container.style.display = '';
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.onclick = async (e) => {
+        e.preventDefault();
+        try {
+          await supabase.auth.signOut();
+          window.location.href = "../login/";
+        } catch (err) {
+          console.error('Logout error:', err);
+        }
+      };
+    }
+  } else {
+    container.innerHTML = '<a href="../login/" class="nav-auth-btn">Sign In</a>';
+    container.style.display = '';
+  }
+}
+
+async function ensureNotificationPermission() {
+  if (typeof window === 'undefined' || typeof Notification === 'undefined') return 'unsupported';
+  if (Notification.permission === 'granted') return 'granted';
+  if (Notification.permission === 'denied') return 'denied';
+  return await Notification.requestPermission();
+}
+
+function getMentionTargets(text) {
+  if (!text) return [];
+  const matches = text.match(/@[^\s]+/g) || [];
+  return [...new Set(matches.map(match => match.slice(1).replace(/[.,!?;:]+$/, '').toLowerCase()).filter(Boolean))];
+}
+
+function shouldNotifyForMention(msgData) {
+  if (!msgData || !msgData.text || !currentUser || msgData.senderId === currentUser.id || msgData.userId === currentUser.id) return false;
+
+  const targets = getMentionTargets(msgData.text);
+  if (targets.length === 0) return false;
+
+  const currentName = (currentUsername || '').toLowerCase();
+  const senderRole = (msgData.role || 'user').toLowerCase();
+  const isAdminPlus = senderRole === 'admin' || senderRole === 'owner';
+  const mentionsMod = targets.includes('mod');
+  const mentionsSpecial = targets.includes('everyone') || targets.includes('here');
+
+  if (mentionsMod) {
+    return currentUserRole === 'admin' || currentUserRole === 'owner';
+  }
+
+  if (mentionsSpecial) {
+    return isAdminPlus;
+  }
+
+  return targets.includes(currentName);
+}
+
+function maybeNotifyForMention(msgData) {
+  if (!shouldNotifyForMention(msgData)) return;
+  if (typeof Notification === 'undefined' || Notification.permission !== 'granted') return;
+  if (document.visibilityState === 'visible' && document.hasFocus()) return;
+
+  const targets = getMentionTargets(msgData.text || '');
+  const senderName = msgData.username || 'Someone';
+
+  let notificationBody = `${senderName} mentioned you in chat`;
+  if (targets.includes('mod')) {
+    notificationBody = `${senderName} mentioned moderators in chat`;
+  } else if (targets.includes('everyone')) {
+    notificationBody = `${senderName} mentioned everyone in chat`;
+  } else if (targets.includes('here')) {
+    notificationBody = `${senderName} mentioned here in chat`;
+  }
+
+  new Notification('Chat mention', {
+    body: notificationBody,
+    icon: '../assets/chat-pencil.svg'
+  });
+}
+
+function startCooldownTimer(forcedMuteTime = null) {
+  const btn = document.getElementById("send-message-btn");
+  const textContainer = document.getElementById("cooldown-timer-text");
+
+  if (activeMuteInterval) clearInterval(activeMuteInterval);
+
+  if (forcedMuteTime && forcedMuteTime <= Date.now()) {
+    if (btn) btn.disabled = false;
+    if (textContainer) {
+      textContainer.style.display = "none";
+      textContainer.textContent = "";
+    }
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  if (textContainer) textContainer.style.display = "block";
+
+  const updateDisplay = () => {
+    let remaining = 0;
+    if (forcedMuteTime) {
+      remaining = forcedMuteTime - Date.now();
+    } else {
+      const elapsed = Date.now() - lastMessageTime;
+      remaining = MESSAGE_COOLDOWN - elapsed;
+    }
+
+    if (remaining <= 0) {
+      clearInterval(activeMuteInterval);
+      activeMuteInterval = null;
+      if (btn) btn.disabled = false;
+      if (textContainer) {
+        textContainer.style.display = "none";
+        textContainer.textContent = "";
+      }
+    } else {
+      if (forcedMuteTime) {
+        const totalSecs = Math.ceil(remaining / 1000);
+        const mins = Math.floor(totalSecs / 60);
+        const secs = totalSecs % 60;
+        let timeStr = "";
+        if (mins > 0) timeStr += `${mins} minute${mins > 1 ? 's' : ''} `;
+        timeStr += `${secs} second${secs !== 1 ? 's' : ''}`;
+        if (textContainer) textContainer.textContent = `You are muted for ${timeStr}`;
+      } else {
+        const secondsLeft = Math.ceil(remaining / 1000);
+        if (textContainer) textContainer.textContent = `You must wait ${secondsLeft} more second${secondsLeft > 1 ? 's' : ''} to send a message`;
+      }
+    }
+  };
+
+  updateDisplay();
+  activeMuteInterval = setInterval(updateDisplay, 100);
+}
+
+/* ── VOICE/VIDEO CHAT FUNCTIONS ────────────────────────────── */
+
+function attachStreamToVideo(peerId, stream, isLocal = false) {
+  const grid = document.getElementById('vc-participant-grid');
+  if (!grid) return;
+  
+  const tile = grid.querySelector(`[data-peer-id="${peerId}"]`);
+  if (!tile) return;
+  
+  const videoEl = tile.querySelector('video');
+  if (videoEl && stream) {
+    videoEl.srcObject = stream;
+    videoEl.muted = isLocal;
+    videoEl.play().catch(e => console.warn('Video play error:', e));
+  }
+}
+
+function updateGridParticipantLayout(participantsArray) {
+  const grid = document.getElementById('vc-participant-grid');
+  const countDisplay = document.getElementById('vc-participant-count');
+  
+  if (!grid || !countDisplay) return;
+
+  const count = participantsArray.length;
+  countDisplay.textContent = `${count} participant${count !== 1 ? 's' : ''}`;
+
+  grid.className = '';
+  
+  if (count === 1) grid.classList.add('count-1');
+  else if (count === 2) grid.classList.add('count-2');
+  else if (count === 3) grid.classList.add('count-3');
+  else if (count === 4) grid.classList.add('count-4');
+  else if (count >= 5) grid.classList.add('count-5plus');
+
+  grid.innerHTML = '';
+
+  const sortedParticipants = [...participantsArray].sort((a, b) => {
+    if (a.isScreenSharing && !b.isScreenSharing) return -1;
+    if (!a.isScreenSharing && b.isScreenSharing) return 1;
+    if (a.isSpeaking && !b.isSpeaking) return -1;
+    if (!a.isSpeaking && b.isSpeaking) return 1;
+    return 0;
+  });
+
+  sortedParticipants.forEach((participant) => {
+    const tile = document.createElement('div');
+    tile.className = 'vc-tile';
+    tile.dataset.peerId = participant.peerId;
+
+    if (participant.isScreenSharing || participant.isSpeaking) {
+      tile.classList.add('focus-tile');
+    }
+
+    if (participant.isSpeaking) {
+      tile.classList.add('is-speaking');
+    }
+
+    const videoEl = document.createElement('video');
+    videoEl.autoplay = true;
+    videoEl.playsInline = true;
+    videoEl.setAttribute('playsinline', ''); 
+    videoEl.setAttribute('webkit-playsinline', '');
+    videoEl.muted = participant.peerId === vcPeer?.id || participant.userId === currentUser?.id;
+    
+    if (!participant.isCameraOn && !participant.isScreenSharing) {
+      videoEl.classList.add('is-hidden');
+    }
+
+    const avatarEl = document.createElement('div');
+    avatarEl.className = 'vc-avatar-img';
+    if (participant.isCameraOn || participant.isScreenSharing) {
+      avatarEl.classList.add('is-hidden');
+    }
+    avatarEl.textContent = (participant.username || 'U').charAt(0).toUpperCase();
+
+    const overlayEl = document.createElement('div');
+    overlayEl.className = 'vc-tile-overlay';
+
+    const infoEl = document.createElement('div');
+    infoEl.className = 'vc-tile-info';
+
+    const usernameEl = document.createElement('div');
+    usernameEl.className = 'vc-username';
+    usernameEl.textContent = participant.username || 'User';
+    infoEl.appendChild(usernameEl);
+
+    if (participant.isMuted) {
+      const micBadge = document.createElement('div');
+      micBadge.className = 'vc-status-badge';
+      const micImg = document.createElement('img');
+      micImg.src = '../assets/chat-vc-mic-muted.svg';
+      micImg.alt = 'Muted';
+      micBadge.appendChild(micImg);
+      infoEl.appendChild(micBadge);
+    }
+
+    if (!participant.isCameraOn && !participant.isScreenSharing) {
+      const camBadge = document.createElement('div');
+      camBadge.className = 'vc-status-badge';
+      const camImg = document.createElement('img');
+      camImg.src = '../assets/chat-vc-camera-disabled.svg';
+      camImg.alt = 'Camera off';
+      camBadge.appendChild(camImg);
+      infoEl.appendChild(camBadge);
+    }
+
+    if (participant.isScreenSharing) {
+      const screenBadge = document.createElement('div');
+      screenBadge.className = 'vc-status-badge';
+      const screenImg = document.createElement('img');
+      screenImg.src = '../assets/chat-vc-screenshare.svg';
+      screenImg.alt = 'Screen sharing';
+      screenBadge.appendChild(screenImg);
+      infoEl.appendChild(screenBadge);
+    }
+
+    overlayEl.appendChild(infoEl);
+
+    if (participant.peerId === vcPeer?.id || participant.userId === currentUser?.id && participant.peerId === vcPeer?.id) {
+      const localBadge = document.createElement('div');
+      localBadge.className = 'vc-local-badge';
+      localBadge.textContent = 'You';
+      overlayEl.appendChild(localBadge);
+    }
+
+    tile.appendChild(videoEl);
+    tile.appendChild(avatarEl);
+    tile.appendChild(overlayEl);
+
+    grid.appendChild(tile);
+
+    const stream = participant.peerId === vcPeer?.id ? vcLocalStream : vcRemoteStreams.get(participant.peerId);
+    if (stream) {
+      videoEl.srcObject = stream;
+      videoEl.play().catch(e => console.warn('Video play error:', e));
+    }
+  });
+}
+
+function setParticipantMediaState(peerId, state) {
+  const participant = vcParticipants.get(peerId);
+  if (!participant) return;
+
+  Object.assign(participant, state);
+  vcParticipants.set(peerId, participant);
+
+  updateGridParticipantLayout(Array.from(vcParticipants.values()));
+
+  if (peerId === vcPeer?.id) {
+    Object.assign(vcLocalState, state);
+
+    const micBtn = document.getElementById('vc-mic-btn');
+    const camBtn = document.getElementById('vc-camera-btn');
+
+    if (micBtn) {
+      const micImg = micBtn.querySelector('img');
+      if (micImg) {
+        micImg.src = vcLocalState.isMuted 
+          ? '../assets/chat-vc-mic-muted.svg' 
+          : '../assets/chat-vc-mic-unmuted.svg';
+      }
+    }
+
+    if (camBtn) {
+      const camImg = camBtn.querySelector('img');
+      if (camImg) {
+        camImg.src = vcLocalState.isCameraOn 
+          ? '../assets/chat-vc-camera-enabled.svg' 
+          : '../assets/chat-vc-camera-disabled.svg';
+      }
+    }
+  }
+}
+
+async function joinVoiceRoom(roomId) {
+  vcActiveRoomId = roomId;
+  const dock = document.getElementById('vc-dock-container');
+  if (dock) {
+    dock.style.display = 'flex';
+    dock.style.flexDirection = 'column';
+  }
+
+  if (!currentUser) return;
+
+  try {
+    vcLocalStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+  } catch (err) {
+    console.error('Failed to get media:', err);
+    showLocalSystemMessage('Could not access camera/microphone. Please check permissions.', true);
+    return;
+  }
+
+  const peerSuffix = (window.crypto && typeof window.crypto.randomUUID === 'function')
+    ? window.crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const myPeerId = `${currentUser.id}-${peerSuffix}`;
+  
+  if (typeof Peer === 'undefined') {
+    console.error('PeerJS library not loaded');
+    showLocalSystemMessage('Voice chat system failed to initialize.', true);
+    return;
+  }
+
+  vcPeer = new Peer(myPeerId);
+  vcPeerId = myPeerId;
+
+  vcPeer.on('open', (id) => {
+    console.log('PeerJS connected with ID:', id);
+    broadcastVCPresence(roomId, id);
+  });
+
+  vcPeer.on('call', (call) => {
+    console.log('Incoming call from:', call.peer);
+    if (!vcCalls.has(call.peer)) {
+      vcCalls.set(call.peer, call);
+    }
+    call.answer(vcLocalStream);
+    handleIncomingCall(call);
+  });
+
+  vcPeer.on('error', (err) => {
+    console.error('PeerJS error:', err);
+    if (err.type === 'peer-unavailable') {
+      console.warn('Peer unavailable:', err);
+    }
+  });
+
+  vcPeer.on('disconnected', () => {
+    console.log('PeerJS disconnected');
+    if (vcActiveRoomId) {
+      vcPeer.reconnect();
+    }
+  });
+
+  subscribeToVCChannel(roomId);
+
+  const localParticipant = {
+    peerId: myPeerId,
+    userId: currentUser.id,
+    username: currentUsername,
+    isMuted: vcLocalState.isMuted,
+    isCameraOn: true,
+    isScreenSharing: false,
+    isSpeaking: false
+  };
+  vcParticipants.set(myPeerId, localParticipant);
+  updateGridParticipantLayout(Array.from(vcParticipants.values()));
+}
+
+function broadcastVCPresence(roomId, peerId) {
+  if (vcRealtimeChannel) {
+    vcRealtimeChannel.unsubscribe();
+  }
+
+  vcRealtimeChannel = supabase.channel(`vc_room_${roomId}`, {
+    config: { broadcast: { self: false } }
+  });
+
+  vcRealtimeChannel
+    .on('broadcast', { event: 'vc-join' }, ({ payload }) => {
+      handleVCJoinEvent(payload);
+    })
+    .on('broadcast', { event: 'vc-leave' }, ({ payload }) => {
+      handleVCLeaveEvent(payload);
+    })
+    .on('broadcast', { event: 'vc-state' }, ({ payload }) => {
+      handleVCStateEvent(payload);
+    })
+    .subscribe((status) => {
+      if (status === 'SUBSCRIBED') {
+        vcRealtimeChannel.send({
+          type: 'broadcast',
+          event: 'vc-join',
+          payload: {
+            peerId: peerId,
+            userId: currentUser.id,
+            username: currentUsername,
+            timestamp: Date.now()
+          }
+        });
+      }
+    });
+}
+
+function handleVCJoinEvent(payload) {
+  const { peerId, username, userId } = payload;
+  
+  if (!peerId || peerId === vcPeer?.id) return;
+
+  if (!vcParticipants.has(peerId)) {
+    vcParticipants.set(peerId, {
+      peerId: peerId,
+      userId: userId || null,
+      username: username || 'User',
+      isMuted: false,
+      isCameraOn: true,
+      isScreenSharing: false,
+      isSpeaking: false
+    });
+    updateGridParticipantLayout(Array.from(vcParticipants.values()));
+  }
+
+  const remoteUserId = userId || peerId;
+  const localPeerId = vcPeer?.id || '';
+  if (currentUser?.id < remoteUserId || (currentUser?.id === remoteUserId && localPeerId < peerId)) {
+    callPeer(peerId);
+  }
+}
+
+function handleVCLeaveEvent(payload) {
+  const { peerId } = payload;
+  if (!peerId || peerId === vcPeer?.id) return;
+
+  vcParticipants.delete(peerId);
+  
+  const remoteStream = vcRemoteStreams.get(peerId);
+  if (remoteStream) {
+    remoteStream.getTracks().forEach(track => track.stop());
+    vcRemoteStreams.delete(peerId);
+  }
+
+  const call = vcCalls.get(peerId);
+  if (call) {
+    call.close();
+    vcCalls.delete(peerId);
+  }
+
+  updateGridParticipantLayout(Array.from(vcParticipants.values()));
+}
+
+function handleVCStateEvent(payload) {
+  const { peerId, state } = payload;
+  if (!peerId || peerId === vcPeer?.id) return;
+
+  const participant = vcParticipants.get(peerId);
+  if (participant) {
+    Object.assign(participant, state);
+    vcParticipants.set(peerId, participant);
+    updateGridParticipantLayout(Array.from(vcParticipants.values()));
+  }
+}
+
+function callPeer(peerId) {
+  if (!vcPeer || !vcLocalStream) return;
+  if (vcCalls.has(peerId)) return;
+
+  console.log('Calling peer:', peerId);
+  const call = vcPeer.call(peerId, vcLocalStream);
+  
+  if (!call) return;
+
+  vcCalls.set(peerId, call);
+  handleIncomingCall(call);
+}
+
+function handleIncomingCall(call) {
+  call.on('stream', (remoteStream) => {
+    console.log('Received stream from:', call.peer);
+    vcRemoteStreams.set(call.peer, remoteStream);
+
+    if (!vcParticipants.has(call.peer)) {
+      vcParticipants.set(call.peer, {
+        peerId: call.peer,
+        userId: null,
+        username: 'User',
+        isMuted: false,
+        isCameraOn: true,
+        isScreenSharing: false,
+        isSpeaking: false
+      });
+    }
+
+    updateGridParticipantLayout(Array.from(vcParticipants.values()));
+  });
+
+  call.on('close', () => {
+    console.log('Call closed with:', call.peer);
+    vcCalls.delete(call.peer);
+    vcRemoteStreams.delete(call.peer);
+  });
+
+  call.on('error', (err) => {
+    console.error('Call error:', err);
+  });
+}
+
+function subscribeToVCChannel(roomId) {}
+
+async function leaveVoiceRoom() {
+  if (vcRealtimeChannel) {
+    vcRealtimeChannel.send({
+      type: 'broadcast',
+      event: 'vc-leave',
+      payload: {
+        peerId: vcPeer?.id || currentUser?.id,
+        timestamp: Date.now()
+      }
+    });
+    vcRealtimeChannel.unsubscribe();
+    vcRealtimeChannel = null;
+  }
+
+  if (vcActiveRoomId && vcParticipants.size <= 1) {
+    try {
+      await supabase.from("vc_rooms").delete().eq("room_id", vcActiveRoomId);
+      await supabase.from("messages").update({ text: "This call has ended." }).eq("room_id", vcActiveRoomId);
+      await supabase.from("whispers").update({ text: "This call has ended." }).eq("room_id", vcActiveRoomId);
+    } catch (e) {
+      console.error("Failed to cleanup VC room", e);
+    }
+  }
+
+  if (vcScreenStream) {
+    vcScreenStream.getTracks().forEach(track => track.stop());
+    vcScreenStream = null;
+  }
+
+  if (vcLocalStream) {
+    vcLocalStream.getTracks().forEach(track => track.stop());
+    vcLocalStream = null;
+  }
+
+  vcRemoteStreams.forEach((stream) => {
+    stream.getTracks().forEach(track => track.stop());
+  });
+  vcRemoteStreams.clear();
+
+  vcCalls.forEach((call) => {
+    call.close();
+  });
+  vcCalls.clear();
+
+  if (vcPeer) {
+    vcPeer.destroy();
+    vcPeer = null;
+  }
+  vcPeerId = null;
+
+  vcParticipants.clear();
+  vcActiveRoomId = null;
+
+  vcLocalState = {
+    isMuted: false,
+    isCameraOn: true,
+    isScreenSharing: false,
+    isSpeaking: false,
+    currentFacingMode: 'user'
+  };
+
+  const dock = document.getElementById('vc-dock-container');
+  if (dock) {
+    dock.style.display = 'none';
+  }
+
+  const grid = document.getElementById('vc-participant-grid');
+  if (grid) {
+    grid.innerHTML = '';
+  }
+
+  const micBtn = document.getElementById('vc-mic-btn');
+  const camBtn = document.getElementById('vc-camera-btn');
+  if (micBtn) {
+    const micImg = micBtn.querySelector('img');
+    if (micImg) micImg.src = '../assets/chat-vc-mic-unmuted.svg';
+  }
+  if (camBtn) {
+    const camImg = camBtn.querySelector('img');
+    if (camImg) camImg.src = '../assets/chat-vc-camera-disabled.svg';
+  }
+}
+
+async function toggleMic() {
+  if (!vcLocalStream) return;
+  const audioTrack = vcLocalStream.getAudioTracks()[0];
+  if (!audioTrack) return;
+
+  audioTrack.enabled = !audioTrack.enabled;
+  const newMutedState = !audioTrack.enabled;
+
+  setParticipantMediaState(vcPeer?.id || currentUser.id, { isMuted: newMutedState });
+
+  if (vcRealtimeChannel) {
+    vcRealtimeChannel.send({
+      type: 'broadcast',
+      event: 'vc-state',
+      payload: {
+        peerId: vcPeer?.id || currentUser.id,
+        state: { isMuted: newMutedState }
+      }
+    });
+  }
+}
+
+async function toggleCamera() {
+  if (!vcLocalStream) return;
+  const videoTrack = vcLocalStream.getVideoTracks()[0];
+  if (!videoTrack) return;
+
+  videoTrack.enabled = !videoTrack.enabled;
+  const newCameraState = videoTrack.enabled;
+
+  setParticipantMediaState(vcPeer?.id || currentUser.id, { isCameraOn: newCameraState });
+
+  if (vcRealtimeChannel) {
+    vcRealtimeChannel.send({
+      type: 'broadcast',
+      event: 'vc-state',
+      payload: {
+        peerId: vcPeer?.id || currentUser.id,
+        state: { isCameraOn: newCameraState }
+      }
+    });
+  }
+}
+
+async function flipCamera() {
+  if (!vcLocalStream) return;
+  const videoTrack = vcLocalStream.getVideoTracks()[0];
+  if (!videoTrack) return;
+
+  const currentFacingMode = vcLocalState.currentFacingMode || 'user';
+  const newFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+
+  try {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: newFacingMode } },
+      audio: false
+    });
+    
+    vcLocalState.currentFacingMode = newFacingMode;
+    const newVideoTrack = newStream.getVideoTracks()[0];
+    
+    vcCalls.forEach((call) => {
+      if (call.peerConnection) {
+        const sender = call.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+        if (sender) {
+          sender.replaceTrack(newVideoTrack).catch(e => console.error('Replace track error:', e));
+        }
+      }
+    });
+
+    videoTrack.stop();
+    vcLocalStream.removeTrack(videoTrack);
+    vcLocalStream.addTrack(newVideoTrack);
+    
+    const localTile = document.querySelector(`[data-peer-id="${vcPeer?.id || currentUser.id}"] video`);
+    if (localTile) localTile.srcObject = vcLocalStream;
+
+  } catch (err) {
+    console.error('Flip camera failed:', err);
+    showLocalSystemMessage('Could not flip camera. Make sure both cameras are available.', true);
+  }
+}
+
+async function toggleScreenShare() {
+  if (!currentUser) return;
+
+  if (isIOS) {
+    showLocalSystemMessage("Screen sharing is not supported on iPad/iOS devices due to browser limitations.", true);
+    return;
+  }
+
+  if (vcLocalState.isScreenSharing) {
+    if (vcScreenStream) {
+      vcScreenStream.getTracks().forEach(t => t.stop());
+      vcScreenStream = null;
+    }
+
+    const cameraTrack = vcLocalStream?.getVideoTracks()[0];
+    if (cameraTrack) {
+      cameraTrack.enabled = true;
+
+      vcCalls.forEach((call) => {
+        if (call.peerConnection) {
+          const sender = call.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+          if (sender) {
+            sender.replaceTrack(cameraTrack).catch(e => console.error('Replace track error:', e));
+          }
+        }
+      });
+    }
+
+    setParticipantMediaState(vcPeer?.id || currentUser.id, { isScreenSharing: false, isCameraOn: true });
+
+    if (vcRealtimeChannel) {
+      vcRealtimeChannel.send({
+        type: 'broadcast',
+        event: 'vc-state',
+        payload: {
+          peerId: vcPeer?.id || currentUser.id,
+          state: { isScreenSharing: false, isCameraOn: true }
+        }
+      });
+    }
+  } else {
+    try {
+      vcScreenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+      const screenTrack = vcScreenStream.getVideoTracks()[0];
+
+      const cameraTrack = vcLocalStream?.getVideoTracks()[0];
+      if (cameraTrack) {
+        cameraTrack.enabled = false;
+      }
+
+      vcCalls.forEach((call) => {
+        if (call.peerConnection) {
+          const sender = call.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
+          if (sender) {
+            sender.replaceTrack(screenTrack).catch(e => console.error('Replace track error:', e));
+          }
+        }
+      });
+
+      screenTrack.onended = () => {
+        if (vcLocalState.isScreenSharing) {
+          toggleScreenShare();
+        }
+      };
+
+      setParticipantMediaState(vcPeer?.id || currentUser.id, { isScreenSharing: true, isCameraOn: false });
+
+      if (vcRealtimeChannel) {
+        vcRealtimeChannel.send({
+          type: 'broadcast',
+          event: 'vc-state',
+          payload: {
+            peerId: vcPeer?.id || currentUser.id,
+            state: { isScreenSharing: true, isCameraOn: false }
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Screenshare failed:', err);
+      if (err.name !== 'AbortError') {
+        showLocalSystemMessage('Screen sharing failed: ' + err.message, true);
+      }
+    }
+  }
+}
+
+/* ── VC CONTROL BUTTON HANDLERS ───────────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  const micBtn = document.getElementById('vc-mic-btn');
+  const camBtn = document.getElementById('vc-camera-btn');
+  const flipBtn = document.getElementById('vc-flip-btn');
+  const screenshareBtn = document.getElementById('vc-screenshare-btn');
+  const leaveBtn = document.getElementById('vc-leave-btn');
+
+  if (micBtn) micBtn.onclick = () => toggleMic();
+  if (camBtn) camBtn.onclick = () => toggleCamera();
+  if (flipBtn) flipBtn.onclick = () => flipCamera();
+  if (screenshareBtn) screenshareBtn.onclick = () => toggleScreenShare();
+  if (leaveBtn) leaveBtn.onclick = () => leaveVoiceRoom();
+});
+
+async function startChat(user) {
+  const input = document.getElementById("message-input");
+  const btn = document.getElementById("send-message-btn");
+  const scroller = document.getElementById("message-scroller");
+  const fileInput = document.getElementById("file-input");
+  const uploadBtn = document.getElementById("upload-btn");
+
+  await ensureNotificationPermission();
+  await loadAndCacheAllUsers();
+  await loadAvatarIndex();
+
+  listenForNewMessages(user);
+  scroller.addEventListener("scroll", handleScrollPagination);
+  setupAutocompleteEngine(input);
+  
+  setInterval(async () => {
+    if (!currentUser) return;
+    const { data: profile, error } = await supabase.from("users").select("bannedUntil, mutedUntil, role").eq("id", currentUser.id).single();
+    if (profile && !error) {
+      const oldBannedUntil = currentUserBannedUntil;
+      const oldMutedUntil = currentUserMutedUntil;
+      currentUserBannedUntil = profile.bannedUntil || 0;
+      currentUserMutedUntil = profile.mutedUntil || 0;
+      currentUserRole = profile.role || "user";
+      
+      if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) {
+        handleBannedUserDisplay();
+      } else if (oldBannedUntil && oldBannedUntil > Date.now() && (!currentUserBannedUntil || currentUserBannedUntil <= Date.now())) {
+        const inputRow = document.querySelector(".input-row");
+        const inputField = document.getElementById("message-input");
+        const sendBtn = document.getElementById("send-message-btn");
+        if (inputRow) inputRow.style.display = "flex";
+        if (inputField) inputField.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        
+        if (currentUserMutedUntil && Date.now() < currentUserMutedUntil) {
+          startCooldownTimer(currentUserMutedUntil);
+        } else if (activeMuteInterval) {
+          clearInterval(activeMuteInterval);
+          activeMuteInterval = null;
+          const textContainer = document.getElementById("cooldown-timer-text");
+          if (textContainer) {
+            textContainer.style.display = "none";
+            textContainer.textContent = "";
+          }
+        }
+        renderMessages();
+      } else if ((!oldMutedUntil || oldMutedUntil <= Date.now()) && currentUserMutedUntil && Date.now() < currentUserMutedUntil) {
+        startCooldownTimer(currentUserMutedUntil);
+      }
+    }
+  }, 3000);
+
+  if (uploadBtn && fileInput) {
+    uploadBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file || !currentUser) return;
+
+      uploadBtn.disabled = true;
+
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const filePath = `${currentUser.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("chat-files")
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage
+          .from("chat-files")
+          .getPublicUrl(filePath);
+
+        const publicUrl = data.publicUrl;
+
+        const { error: msgError } = await supabase.from("messages").insert([{
+          text: publicUrl,
+          username: currentUsername,
+          userId: currentUser.id,
+          avatar: currentUsername ? currentUsername[0].toUpperCase() : "U",
+          role: currentUserRole
+        }]);
+
+        if (msgError) throw msgError;
+
+      } catch (err) {
+        console.error("Upload failed:", err);
+        showLocalSystemMessage("File upload failed: " + err.message, true);
+      } finally {
+        uploadBtn.disabled = false;
+        fileInput.value = "";
+      }
+    };
+  }
+
+  btn.onclick = async () => {
+    if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) {
+      handleBannedUserDisplay();
+      return;
+    }
+    
+    let textToSend = input.value.trim();
+    if (!textToSend) return;
+
+    if (currentUserMutedUntil && Date.now() < currentUserMutedUntil) {
+      startCooldownTimer(currentUserMutedUntil);
+      return;
+    }
+
+    if (isEditingMode) {
+      try {
+        const { error } = await supabase
+          .from(editingCollectionTarget)
+          .update({ text: textToSend })
+          .eq("id", editingMessageId);
+
+        if (error) throw error;
+      } catch (err) {
+        console.error("Error writing message update modification:", err);
+      }
+      isEditingMode = false;
+      editingMessageId = null;
+      btn.textContent = "Send";
+      input.value = "";
+      return;
+    }
+
+    const isAdminPlus = currentUserRole === "admin" || currentUserRole === "owner";
+    const now = Date.now();
+    if (!isAdminPlus && now - lastMessageTime < MESSAGE_COOLDOWN) return;
+
+    input.value = "";
+    lastMessageTime = now;
+    clearEphemeralSystemMessages();
+
+    if (!isAdminPlus) {
+      startCooldownTimer();
+    }
+    closePopover();
+
+    if (textToSend.startsWith("/")) {
+      const segments = textToSend.split(/\s+/);
+      const commandKey = segments[0].toLowerCase();
+      
+      const mentions = textToSend.match(/@[^\s]+/g) || [];
+      let targetUsernames = mentions.map(m => m.substring(1).replace(/[.,!?;:]+$/, '').toLowerCase()).filter(Boolean);
+      
+      let effectiveSegments = [...segments];
+      
+      if (targetUsernames.length === 0 && segments.length > 1) {
+        const firstArg = segments[1];
+        const isDuration = /^\d+(s|m|h|d|w|mo|y)$/i.test(firstArg);
+        if (!isDuration && firstArg.length > 0) {
+          targetUsernames.push(firstArg.replace(/[.,!?;:]+$/, '').toLowerCase());
+          effectiveSegments = [segments[0], '@' + firstArg, ...segments.slice(2)];
+        }
+      }
+
+      const isOwnerOnly = currentUserRole === "owner";
+
+      async function resolveTargetUser() {
+        if (targetUsernames.length === 0) return null;
+        const searchName = targetUsernames[0];
+
+        let found = localUsersCache.find(u => u.username && u.username.toLowerCase() === searchName);
+        if (found) return found;
+
+        const { data } = await supabase
+          .from("users")
+          .select("id, username, role")
+          .ilike("username", searchName)
+          .maybeSingle();
+
+        return data || null;
+      }
+
+      function checkRoleHierarchy(target) {
+        if (!target) return false;
+        if (target.id === currentUser.id) {
+          showLocalSystemMessage("You cannot perform this action on yourself.", true);
+          return false;
+        }
+        if (target.role === "owner" && currentUserRole !== "owner") {
+          showLocalSystemMessage("You cannot perform this action on an Owner.", true);
+          return false;
+        }
+        if (target.role === "admin" && currentUserRole === "admin") {
+          showLocalSystemMessage("You cannot perform this action on another Admin.", true);
+          return false;
+        }
+        return true;
+      }
+
+      if (commandKey === "/publicvc") {
+        const roomId = "vc-pub-" + Math.random().toString(36).substring(2, 9);
+        await supabase.from("vc_rooms").insert([{ room_id: roomId, created_by: currentUsername, is_public: true }]);
+        await supabase.from("messages").insert([{
+          text: `@${currentUsername} started a public voice chat!`,
+          username: "Server",
+          userId: null,
+          role: "system",
+          type: "vc_invite",
+          room_id: roomId
+        }]);
+        joinVoiceRoom(roomId);
+        return;
+      }
+
+      if (commandKey === "/privatevc") {
+        const mentionsPrivate = textToSend.match(/@[^\s]+/g) || [];
+        let targetUsernamesPrivate = mentionsPrivate.map(m => m.replace("@", "").replace(/[.,!?;:]+$/, '').toLowerCase()).filter(Boolean);
+        
+        if (targetUsernamesPrivate.length === 0) {
+          let i = 1;
+          while (i < segments.length && segments[i].length > 0) {
+            targetUsernamesPrivate.push(segments[i].replace(/[.,!?;:]+$/, '').toLowerCase());
+            i++;
+          }
+        }
+
+        if (targetUsernamesPrivate.length === 0) {
+          showLocalSystemMessage("Syntax: /privatevc @username1 @username2", true);
+          return;
+        }
+
+        const roomId = "vc-priv-" + Math.random().toString(36).substring(2, 9);
+        const invitedList = [currentUsername, ...targetUsernamesPrivate].join(", ");
+
+        const participantIds = [currentUser.id];
+        for (const uname of targetUsernamesPrivate) {
+            const u = localUsersCache.find(x => x.username.toLowerCase() === uname);
+            if (u) participantIds.push(u.id);
+        }
+
+        await supabase.from("vc_rooms").insert([{
+          room_id: roomId,
+          created_by: currentUsername,
+          is_public: false,
+          allowed_users: [currentUsername.toLowerCase(), ...targetUsernamesPrivate]
+        }]);
+
+        await supabase.from("whispers").insert([{
+          text: `@${currentUsername} started a private voice chat including: ${invitedList}`,
+          username: "Server",
+          senderId: currentUser.id,
+          participants: participantIds,
+          type: "vc_invite",
+          room_id: roomId,
+          role: "system"
+        }]);
+
+        joinVoiceRoom(roomId);
+        return;
+      }
+
+      if (commandKey === "/mute" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        const durationStr = effectiveSegments[2];
+        const durationMs = parseDurationString(durationStr);
+
+        if (!targetUser || !durationMs) {
+          showLocalSystemMessage("Syntax: /mute @username [time, e.g., 45s/30m/4h]", true);
+          return;
+        }
+        if (!checkRoleHierarchy(targetUser)) return;
+
+        const { error } = await supabase.from("users").update({ "mutedUntil": Date.now() + durationMs }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to mute user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Muted user @${targetUser.username} for ${durationStr}.`, false);
+        return;
+      }
+
+      if (commandKey === "/unmute" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /unmute @username", true); return; }
+        const { error } = await supabase.from("users").update({ "mutedUntil": 0 }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to unmute user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Unmuted user @${targetUser.username}.`, false);
+        return;
+      }
+
+      if (commandKey === "/ban" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        const durationStr = effectiveSegments[2];
+        const durationMs = parseDurationString(durationStr);
+        const reason = effectiveSegments.slice(3).join(" ") || "No explicit reason logged.";
+
+        if (!targetUser || !durationMs) {
+          showLocalSystemMessage("Syntax: /ban @username [time, e.g., 10s/2h/15d] [reason]", true);
+          return;
+        }
+        if (!checkRoleHierarchy(targetUser)) return;
+
+        const banTimestamp = Date.now() + durationMs;
+        const { error } = await supabase.from("users").update({ "bannedUntil": banTimestamp, "banReason": reason }).eq("id", targetUser.id);
+
+        if (error) { showLocalSystemMessage(`Failed to ban user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Successfully banned @${targetUser.username} for ${durationStr}. Reason: ${reason}`, false);
+        return;
+      }
+
+      if (commandKey === "/unban" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /unban @username", true); return; }
+        const { error } = await supabase.from("users").update({ "bannedUntil": 0, "banReason": null }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to unban user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Lifted ban from user @${targetUser.username}.`, false);
+        return;
+      }
+
+      if (commandKey === "/permaban" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /permaban @username [reason]", true); return; }
+        if (!checkRoleHierarchy(targetUser)) return;
+
+        const reason = effectiveSegments.slice(2).join(" ") || "No explicit reason logged.";
+        const permaTimestamp = Date.now() + (100 * 365 * 24 * 60 * 60 * 1000);
+
+        const { error } = await supabase.from("users").update({ "bannedUntil": permaTimestamp, "banReason": reason }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to permaban user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Permanently banned @${targetUser.username}. Reason: ${reason}`, false);
+        return;
+      }
+
+      if (commandKey === "/kick" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /kick @username [reason]", true); return; }
+        if (!checkRoleHierarchy(targetUser)) return;
+
+        const reason = effectiveSegments.slice(2).join(" ") || "No explicit reason logged.";
+        const kickTimestamp = Date.now() + (2 * 60 * 1000);
+
+        const { error } = await supabase.from("users").update({ "bannedUntil": kickTimestamp, "banReason": reason }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to kick user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Kicked user @${targetUser.username} for 2 minutes. Reason: ${reason}`, false);
+        return;
+      }
+
+      if (commandKey === "/admin" && isOwnerOnly) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /admin @username", true); return; }
+        const { error } = await supabase.from("users").update({ role: "admin" }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to promote user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Promoted @${targetUser.username} to Admin.`, false);
+        return;
+      }
+
+      if (commandKey === "/unadmin" && isOwnerOnly) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /unadmin @username", true); return; }
+        const { error } = await supabase.from("users").update({ role: "user" }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to demote user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Demoted @${targetUser.username} to standard User level.`, false);
+        return;
+      }
+
+      if (commandKey === "/owner" && isOwnerOnly) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /owner @username", true); return; }
+        const { error } = await supabase.from("users").update({ role: "owner" }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to promote user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Promoted @${targetUser.username} to Owner privileges.`, false);
+        return;
+      }
+
+      if (commandKey === "/unowner" && isOwnerOnly) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /unowner @username", true); return; }
+        const { error } = await supabase.from("users").update({ role: "admin" }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to demote user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Demoted @${targetUser.username} to Admin.`, false);
+        return;
+      }
+
+      if (commandKey === "/subscription" && isOwnerOnly) {
+        const targetUser = await resolveTargetUser();
+        const chosenRank = effectiveSegments[2]?.toLowerCase();
+        if (!targetUser || (chosenRank !== "basic" && chosenRank !== "premium")) { showLocalSystemMessage("Syntax: /subscription @username basic/premium", true); return; }
+        const { error } = await supabase.from("users").update({ rank: chosenRank }).eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to update subscription: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Updated subscription parameters for @${targetUser.username} to [${chosenRank}].`, false);
+        await loadAndCacheAllUsers();
+        return;
+      }
+
+      if (commandKey === "/deleteuser" && isOwnerOnly) {
+        const targetUser = await resolveTargetUser();
+        if (!targetUser) { showLocalSystemMessage("Syntax: /deleteuser @username", true); return; }
+        const { error } = await supabase.from("users").delete().eq("id", targetUser.id);
+        if (error) { showLocalSystemMessage(`Failed to delete user: ${error.message}`, true); return; }
+        showLocalSystemMessage(`Purged user database records for user identity: @${targetUser.username}.`, false);
+        await loadAndCacheAllUsers();
+        return;
+      }
+
+      if (commandKey === "/deleteall" && isAdminPlus) {
+        await supabase.from("messages").delete().not('id', 'is', null);
+        await supabase.from("whispers").delete().not('id', 'is', null);
+        showLocalSystemMessage("Database messages and whispers wiped.", false);
+        return;
+      }
+
+      if (commandKey === "/warn" && isAdminPlus) {
+        const targetUser = await resolveTargetUser();
+        const reason = effectiveSegments.slice(2).join(" ");
+        if (!targetUser || !reason) { showLocalSystemMessage("Syntax: /warn @username [reason]", true); return; }
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayTimestamp = today.toISOString();
+        
+        let warnCount = 1;
+        try {
+            const { data: warnsToday } = await supabase
+                .from("whispers")
+                .select("id")
+                .contains("participants", [targetUser.id])
+                .gte("timestamp", todayTimestamp)
+                .ilike("text", "Warning %");
+            if (warnsToday) warnCount = warnsToday.length + 1;
+        } catch(e) { console.warn("Could not fetch warn count", e); }
+
+        const warnText = `Warning ${warnCount}: ${reason}`;
+        
+        await supabase.from("whispers").insert([{
+            text: warnText,
+            username: "Server",
+            senderId: currentUser.id,
+            participants: [currentUser.id, targetUser.id],
+            role: "system"
+        }]);
+        
+        showLocalSystemMessage(`Issued warning ${warnCount} to @${targetUser.username}.`, false);
+        return;
+      }
+
+      if (commandKey === "/undo") {
+        if (!lastActionLog) { showLocalSystemMessage("No valid local environment modifications recorded.", true); return; }
+        try {
+          if (lastActionLog.type === "delete") {
+            await supabase.from(lastActionLog.collection).insert([lastActionLog.data]);
+            showLocalSystemMessage("Undo Executed: Restored deleted record.");
+          } else if (lastActionLog.type === "edit") {
+            await supabase.from(lastActionLog.collection).update({ text: lastActionLog.data.text }).eq("id", lastActionLog.id);
+            showLocalSystemMessage("Undo Executed: Reverted text modifications.");
+          }
+          lastActionLog = null;
+        } catch(err) {
+          showLocalSystemMessage("Failed to restore record.", true);
+        }
+        return;
+      }
+
+      if (!["/w", "/whisper", "/omoggle", "/publicvc", "/privatevc"].includes(commandKey)) {
+        showLocalSystemMessage(`System Warning: Command '${commandKey}' is unrecognized or unauthorized.`, true);
+        return;
+      }
+    }
+
+    const segments = textToSend.split(/\s+/);
+    const primaryCommandKey = segments[0].toLowerCase();
+    const isWhisperCommand = primaryCommandKey === "/w" || primaryCommandKey === "/whisper";
+    const isOmoggleCommand = primaryCommandKey === "/omoggle";
+    let targetUsernames = [];
+    let parsedText = textToSend;
+
+    if (isWhisperCommand || isOmoggleCommand) {
+      let i = 1;
+      while (i < segments.length) {
+        let token = segments[i];
+        if (token.startsWith("@")) {
+          targetUsernames.push(token.substring(1).replace(/[.,!?;:]+$/, '').toLowerCase());
+          i++;
+        } else if (targetUsernames.length === 0) {
+          targetUsernames.push(token.toLowerCase().replace(/[.,!?;:]+$/, ''));
+          i++;
+        } else {
+          break;
+        }
+      }
+      parsedText = segments.slice(i).join(" ");
+    }
+
+    const clientSideId = "msg-" + Date.now() + Math.random().toString(36).substring(2);
+
+    const pendingMsgData = {
+      text: isOmoggleCommand && !parsedText ? "Do you want to duel in Omoggle?" : parsedText,
+      username: currentUsername,
+      userId: user.id,
+      senderId: user.id,
+      avatar: currentUsername && currentUsername.length > 0 ? currentUsername[0].toUpperCase() : "U",
+      timestamp: null,
+      isPending: true,
+      isWhisper: targetUsernames.length > 0,
+      isOmoggleInvite: isOmoggleCommand,
+      inviteStatus: isOmoggleCommand ? "pending" : null,
+      isSystemMessage: isOmoggleCommand,
+      role: currentUserRole,
+      clientSideId: clientSideId
+    };
+
+    localPendingQueue.push(pendingMsgData);
+    renderMessages(true);
+
+    try {
+      if (targetUsernames.length > 0) {
+        let participantIds = [user.id];
+
+        targetUsernames.forEach(uname => {
+          const matchedUser = localUsersCache.find(u => u.username.toLowerCase() === uname);
+          if (matchedUser && !participantIds.includes(matchedUser.id)) {
+            participantIds.push(matchedUser.id);
+          }
+        });
+
+        if (participantIds.length === 1) {
+          throw new Error("No valid recipients found with those usernames in your local cache maps.");
+        }
+
+        const challengePayload = {
+          text: isOmoggleCommand && !parsedText ? "Do you want to duel in Omoggle?" : parsedText,
+          username: currentUsername,
+          senderId: user.id,
+          avatar: currentUsername && currentUsername.length > 0 ? currentUsername[0].toUpperCase() : "U",
+          participants: participantIds,
+          role: currentUserRole,
+          clientSideId: clientSideId
+        };
+
+        if (isOmoggleCommand) {
+          challengePayload.isOmoggleInvite = true;
+          challengePayload.inviteStatus = "pending";
+        }
+
+        const { error } = await supabase.from("whispers").insert([challengePayload]);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("messages").insert([{
+          text: textToSend,
+          username: currentUsername,
+          userId: user.id,
+          avatar: currentUsername && currentUsername.length > 0 ? currentUsername[0].toUpperCase() : "U",
+          role: currentUserRole,
+          clientSideId: clientSideId
+        }]);
+        if (error) throw error;
+      }
+    } catch (err) {
+      console.error("Error sending message:", err);
+      showLocalSystemMessage(err.message || "Failed to deliver message payload channels.", true);
+      localPendingQueue = localPendingQueue.filter(m => m.clientSideId !== clientSideId);
+      renderMessages();
+    }
+  };
+}
+
+function updateAutocompleteCacheFromLoadedMessages() {
+  const uniqueUsers = new Map();
+
+  allRegisteredUsers.forEach(user => {
+    uniqueUsers.set(user.id, user);
+  });
+
+  let allMessages = [...dbHistoricalMessages, ...dbPublicMessages, ...dbPrivateMessages];
+  allMessages.forEach(msg => {
+    if (msg.userId && msg.username) {
+      uniqueUsers.set(msg.userId, {
+        id: msg.userId,
+        username: msg.username,
+        avatar: msg.avatar || msg.username[0].toUpperCase()
+      });
+    } else if (msg.senderId && msg.username) {
+      uniqueUsers.set(msg.senderId, {
+        id: msg.senderId,
+        username: msg.username,
+        avatar: msg.avatar || msg.username[0].toUpperCase()
+      });
+    }
+  });
+
+  localUsersCache = Array.from(uniqueUsers.values());
+}
+
+async function listenForNewMessages(user) {
+  const { data: initialPublic } = await supabase
+    .from("messages")
+    .select("*")
+    .order("timestamp", { ascending: false })
+    .range(0, 19);
+
+  if (initialPublic) {
+    dbPublicMessages = initialPublic.map(m => ({ ...m, isWhisper: false, isSystemMessage: m.role === "system" })).reverse();
+    initialSnapshotReceived = true;
+    if (initialPublic.length < 20) allMessagesLoaded = true;
+    historyPageOffset = dbPublicMessages.length;
+    renderMessages();
+  }
+
+  const { data: initialPrivate } = await supabase
+    .from("whispers")
+    .select("*")
+    .contains("participants", [user.id]);
+
+  if (initialPrivate) {
+    dbPrivateMessages = initialPrivate.map(m => ({ ...m, isWhisper: true, isSystemMessage: m.isOmoggleInvite === true }));
+    renderMessages();
+  }
+
+  if (publicChannel) publicChannel.unsubscribe();
+  publicChannel = supabase
+    .channel('public:messages')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+      const newMsg = { ...payload.new, isWhisper: false, isSystemMessage: payload.new.role === "system" };
+      maybeNotifyForMention(newMsg);
+      dbPublicMessages.push(newMsg);
+      if (dbPublicMessages.length > 40) dbPublicMessages.shift();
+      renderMessages(true);
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, payload => {
+      dbPublicMessages = dbPublicMessages.filter(m => m.id !== payload.old.id);
+      dbHistoricalMessages = dbHistoricalMessages.filter(m => m.id !== payload.old.id);
+      renderMessages();
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'messages' }, payload => {
+      const idx = dbPublicMessages.findIndex(m => m.id === payload.new.id);
+      if (idx !== -1) dbPublicMessages[idx] = { ...payload.new, isWhisper: false, isSystemMessage: payload.new.role === "system" };
+      const hIdx = dbHistoricalMessages.findIndex(m => m.id === payload.new.id);
+      if (hIdx !== -1) dbHistoricalMessages[hIdx] = { ...payload.new, isWhisper: false, isSystemMessage: payload.new.role === "system" };
+      renderMessages();
+    })
+    .subscribe();
+
+  if (privateChannel) privateChannel.unsubscribe();
+  privateChannel = supabase
+    .channel('public:whispers')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'whispers' }, payload => {
+      const newWhisper = payload.new;
+      if (newWhisper.participants && newWhisper.participants.includes(user.id)) {
+        const incomingMessage = { ...newWhisper, isWhisper: true, isSystemMessage: newWhisper.isOmoggleInvite === true || newWhisper.type === 'vc_invite' || newWhisper.role === 'system' };
+        maybeNotifyForMention(incomingMessage);
+        dbPrivateMessages.push(incomingMessage);
+        renderMessages(true);
+      }
+    })
+    .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'whispers' }, payload => {
+      const updatedWhisper = payload.new;
+      if (updatedWhisper.participants && updatedWhisper.participants.includes(user.id)) {
+        const idx = dbPrivateMessages.findIndex(m => m.id === updatedWhisper.id);
+        if (idx !== -1) {
+          dbPrivateMessages[idx] = { ...updatedWhisper, isWhisper: true, isSystemMessage: updatedWhisper.isOmoggleInvite === true || updatedWhisper.type === 'vc_invite' || updatedWhisper.role === 'system' };
+
+          if (updatedWhisper.isOmoggleInvite && updatedWhisper.inviteStatus === "accepted") {
+            const sessionRedirectToken = `omoggle_redirected_${updatedWhisper.id}`;
+            if (!processedOmoggleRedirects.has(updatedWhisper.id)) {
+              processedOmoggleRedirects.add(updatedWhisper.id);
+              sessionStorage.setItem(sessionRedirectToken, "true");
+
+              const roleIdentityString = user.id === updatedWhisper.senderId ? "host" : "guest";
+              setTimeout(() => {
+                if (window.location.pathname.includes('/omoggle/')) return;
+                window.location.href = `../omoggle/?room=${updatedWhisper.id}&role=${roleIdentityString}&hostName=${encodeURIComponent(updatedWhisper.username)}`;
+              }, 800);
+            }
+          }
+          renderMessages();
+        }
+      }
+    })
+    .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'whispers' }, payload => {
+      dbPrivateMessages = dbPrivateMessages.filter(m => m.id !== payload.old.id);
+      renderMessages();
+    })
+    .subscribe();
+}
+
+function renderMessages(forceScrollDown = false) {
+  if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) {
+    handleBannedUserDisplay();
+    return;
+  }
+
+  const scroller = document.getElementById("message-scroller");
+  if (!scroller) return;
+
+  const isPinnedToBottom = scroller.scrollHeight - scroller.clientHeight <= scroller.scrollTop + 30;
+  const cachedScrollTop = scroller.scrollTop;
+
+  updateAutocompleteCacheFromLoadedMessages();
+  scroller.innerHTML = "";
+
+  if (allMessagesLoaded) {
+    const banner = document.createElement("div");
+    banner.style.cssText = "text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 10px 0; width: 100%; margin-bottom: 0.5rem;";
+    banner.textContent = "All messages loaded";
+    scroller.appendChild(banner);
+  }
+
+  const regularMessages = [...dbHistoricalMessages, ...dbPublicMessages, ...dbPrivateMessages];
+  const hasRegularMessages = regularMessages.some(msg => !msg.isSystemMessage) || localPendingQueue.some(msg => !msg.isSystemMessage);
+  const visibleEphemeralMessages = hasRegularMessages ? [] : ephemeralSystemMessages;
+  let allMessages = [...visibleEphemeralMessages, ...regularMessages];
+
+  const seenIds = new Set();
+  allMessages = allMessages.filter(msg => {
+    const msgId = msg.id || msg.clientSideId;
+    if (!msgId) return true;
+    if (seenIds.has(msgId)) return false;
+    seenIds.add(msgId);
+    return true;
+  });
+
+  allMessages.sort((a, b) => {
+    const timeA = a.timestamp ? new Date(a.timestamp).getTime() : Date.now();
+    const timeB = b.timestamp ? new Date(b.timestamp).getTime() : Date.now();
+    return timeA - timeB;
+  });
+
+  const confirmedDbClientIds = new Set(allMessages.map(m => m.clientSideId).filter(Boolean));
+  localPendingQueue = localPendingQueue.filter(m => !confirmedDbClientIds.has(m.clientSideId));
+
+  allMessages.forEach(msg => displayMessage(scroller, msg));
+  localPendingQueue.forEach(pendingMsg => displayMessage(scroller, pendingMsg));
+
+  if (isFirstLoad && dbPublicMessages.length > 0) {
+    scroller.scrollTop = scroller.scrollHeight;
+    isFirstLoad = false;
+  } else if (isPinnedToBottom || forceScrollDown) {
+    scroller.scrollTop = scroller.scrollHeight;
+  } else {
+    scroller.scrollTop = cachedScrollTop;
+  }
+}
+
+function displayMessage(scroller, msgData) {
+  const div = document.createElement("div");
+  div.className = "msg-block" + (msgData.isPending ? " pending" : "");
+  if(msgData.clientSideId) div.id = msgData.clientSideId;
+
+  const time = msgData.timestamp ? new Date(msgData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Sending...";
+
+  let statusBadgeHTML = "";
+  if (msgData.role === "admin") statusBadgeHTML = `<span class="badge-admin">Admin</span>`;
+  if (msgData.role === "owner") statusBadgeHTML = `<span class="badge-owner">Owner</span>`;
+
+  const whisperTag = msgData.isWhisper ? `<span style="color: #a855f7; font-size: 0.75rem; margin-left: 8px; background: rgba(168,85,247,0.12); padding: 2px 7px; border-radius: 99px; font-weight: 600; border: 1px solid rgba(168,85,247,0.2);">Whisper</span>` : "";
+
+  const safeUsername = msgData.username || "User";
+  const avatarLetter = safeUsername.length > 0 ? safeUsername[0].toUpperCase() : "U";
+
+  let textContent = "";
+  const rawText = msgData.text || "";
+
+  const isImage = (/\.(jpg|jpeg|png|webp|gif|svg)($|\?)/i.test(rawText)) || (rawText.includes('/storage/v1/object/public/') && /\.(jpg|jpeg|png|webp|gif|svg)/i.test(rawText));
+  const isVideo = (/\.(mp4|webm|mov)($|\?)/i.test(rawText));
+  const isAudio = (/\.(mp3|wav|ogg)($|\?)/i.test(rawText));
+
+  if (isImage) {
+    const fileName = rawText.split('/').pop().split('?')[0];
+    textContent = `
+      <div style="margin-top: 6px;">
+        <img src="${escapeHtml(rawText)}" alt="Uploaded File" crossorigin="anonymous" style="max-width: 100%; max-height: 320px; border-radius: 8px; display: block; background: #181b33; object-fit: contain;" onerror="this.onerror=null; this.parentElement.innerHTML='<a href=\'${escapeHtml(rawText)}\' target=\'_blank\' download style=\'display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 6px; color: #3b82f6; text-decoration: none; font-weight: 600;\'>Download ${escapeHtml(fileName)}</a>';" />
+      </div>
+    `;
+  } else if (isVideo) {
+    textContent = `<video controls playsinline webkit-playsinline src="${escapeHtml(rawText)}" style="max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 6px;"></video>`;
+  } else if (isAudio) {
+    textContent = `<audio controls src="${escapeHtml(rawText)}" style="margin-top: 6px; max-width: 100%;"></audio>`;
+  } else if (rawText.startsWith("https://") && rawText.includes("/storage/v1/object/public/")) {
+    const fileName = rawText.split('/').pop().split('?')[0];
+    textContent = `<a href="${escapeHtml(rawText)}" target="_blank" download style="display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); padding: 8px 12px; border-radius: 6px; color: #3b82f6; text-decoration: none; font-weight: 600; margin-top: 4px;">Download ${escapeHtml(fileName)}</a>`;
+  } else {
+    textContent = escapeHtml(rawText).replace(/@([^\s]+)/g, (match, p1) => {
+      const cleanName = p1.replace(/[.,!?;:]+$/, '');
+      const trailing = p1.slice(cleanName.length);
+      return `<span style="color: #3b82f6; background: rgba(59,130,246,0.15); padding: 1px 5px; border-radius: 4px; font-weight: 600; border: 1px solid rgba(59,130,246,0.2);">@${cleanName}</span>${trailing}`;
+    });
+  }
+
+  let layoutStructuralString = "";
+
+  if (msgData.isOmoggleInvite) {
+    let internalDuelPanelHTML = "";
+    let inviteContextLineText = "";
+    const userIsChallengeSender = currentUser && (currentUser.id === msgData.senderId || currentUser.id === msgData.userId);
+
+    if (msgData.inviteStatus === "pending") {
+      if (!userIsChallengeSender) {
+        inviteContextLineText = `<p style="color:#6c63ff; font-weight:600;">@${safeUsername} sent you a duel request on Omoggle!</p>`;
+        internalDuelPanelHTML = `
+          <div class="duel-card">
+            <span class="duel-card-msg">Do you want to duel in Omoggle?</span>
+            <div class="duel-card-actions">
+              <button class="btn-duel-accept">Accept</button>
+              <button class="btn-duel-decline">Decline</button>
+            </div>
+          </div>
+        `;
+      } else {
+        inviteContextLineText = `<p style="color:#6c63ff; font-weight:600;">Sent Omoggle duel request to your opponent (Pending...)</p>`;
+        internalDuelPanelHTML = "";
+      }
+    } else if (msgData.inviteStatus === "accepted") {
+      inviteContextLineText = `<p style="color:#10b981; font-weight:600;">Omoggle duel match accepted!</p>`;
+      internalDuelPanelHTML = `<div class="duel-card" style="border-color:#10b981;"><span class="duel-card-msg" style="color:#10b981;">Duel accepted! Redirecting...</span></div>`;
+    } else {
+      inviteContextLineText = `<p style="color:#ef4444; font-weight:600;">Omoggle challenge update</p>`;
+      internalDuelPanelHTML = `<div class="duel-card" style="border-color:#ef4444;"><span class="duel-card-msg" style="color:#ef4444;">Challenge declined.</span></div>`;
+    }
+
+    layoutStructuralString = `
+      <div class="msg-avatar" style="background: #242549; color: #fff;">S</div>
+      <div class="msg-content">
+        <div class="msg-top">
+          <h5>Server <span>${time}</span></h5>
+        </div>
+        ${inviteContextLineText}
+        ${internalDuelPanelHTML}
+      </div>
+    `;
+  } else if (msgData.type === "vc_invite" || msgData.isSystemMessage) {
+    let vcButtonsHTML = "";
+    
+    if (msgData.type === "vc_invite" && msgData.room_id && msgData.text !== "This call has ended.") {
+      vcButtonsHTML = `
+        <div style="display: flex; gap: 8px; margin-top: 8px;">
+          <button class="btn-duel-accept" onclick="window.joinVoiceRoom('${msgData.room_id}')">Join Voice</button>
+          <button class="btn-duel-decline" onclick="this.closest('.msg-block').remove()">Dismiss</button>
+        </div>
+      `;
+    }
+
+    const isVC = msgData.type === "vc_invite";
+    const avatarIcon = isVC ? "VC" : "S";
+    const headerTitle = isVC ? "Voice Chat" : "Server";
+    const textColor = isVC ? "var(--accent)" : (msgData.isError ? "#ef4444" : "#6c63ff");
+
+    layoutStructuralString = `
+      <div class="msg-avatar" style="background: #242549; color: #fff;">${avatarIcon}</div>
+      <div class="msg-content">
+        <div class="msg-top">
+          <h5>${headerTitle} <span>${time}</span></h5>
+        </div>
+        <p style="color: ${textColor}; font-weight: 600;">${escapeHtml(msgData.text || "")}</p>
+        ${vcButtonsHTML}
+      </div>
+    `;
+  } else {
+    let staticControlsTrayHTML = "";
+    if (currentUser && (currentUser.id === msgData.userId || currentUser.id === msgData.senderId || currentUserRole === "admin" || currentUserRole === "owner")) {
+      staticControlsTrayHTML = `
+        <div class="msg-controls-tray">
+          <button class="action-control-btn btn-edit-msg" title="Modify Context">
+            <img src="../assets/chat-pencil.svg" alt="Edit" class="tray-icon-img">
+          </button>
+          <button class="action-control-btn btn-delete-msg" title="Purge Record">
+            <img src="../assets/chat-trash.svg" alt="Delete" class="tray-icon-img">
+          </button>
+        </div>
+      `;
+    }
+
+    layoutStructuralString = `
+      <div class="msg-avatar"></div>
+      <div class="msg-content">
+        <div class="msg-top">
+          <h5>${safeUsername} <span>${time}</span> ${statusBadgeHTML} ${whisperTag}</h5>
+        </div>
+        <p>${textContent}</p>
+      </div>
+      ${staticControlsTrayHTML}
+    `;
+  }
+
+  div.innerHTML = layoutStructuralString;
+
+  if (!msgData.isSystemMessage && !msgData.isOmoggleInvite) {
+    decorateAvatarElement(div.querySelector('.msg-avatar'), msgData.userId || msgData.senderId, safeUsername, avatarLetter);
+  }
+  if (msgData.isOmoggleInvite && msgData.inviteStatus === "pending" && currentUser && currentUser.id !== msgData.senderId) {
+    const accBtn = div.querySelector(".btn-duel-accept");
+    const decBtn = div.querySelector(".btn-duel-decline");
+    
+    if (accBtn) {
+      accBtn.onclick = async (e) => {
+        e.stopPropagation();
+        accBtn.disabled = true;
+        if (decBtn) decBtn.disabled = true;
+        const { error } = await supabase.from("whispers").update({ inviteStatus: "accepted" }).eq("id", msgData.id);
+        if (error) {
+          console.error("Accept error:", error);
+          showLocalSystemMessage("Failed to accept duel.", true);
+          accBtn.disabled = false;
+          if (decBtn) decBtn.disabled = false;
+        }
+      };
+    }
+    
+    if (decBtn) {
+      decBtn.onclick = async (e) => {
+        e.stopPropagation();
+        decBtn.disabled = true;
+        if (accBtn) accBtn.disabled = true;
+        const { error } = await supabase.from("whispers").update({ inviteStatus: "declined" }).eq("id", msgData.id);
+        if (error) {
+          console.error("Decline error:", error);
+          showLocalSystemMessage("Failed to decline duel.", true);
+          decBtn.disabled = false;
+          if (accBtn) accBtn.disabled = false;
+        }
+      };
+    }
+  }
+
+  const editBtn = div.querySelector(".btn-edit-msg");
+  const deleteBtn = div.querySelector(".btn-delete-msg");
+  const dataCollectionTargetStr = msgData.isWhisper ? "whispers" : "messages";
+
+  if (editBtn) {
+    editBtn.onclick = () => {
+      const messageInput = document.getElementById("message-input");
+      const sendButtonElement = document.getElementById("send-message-btn");
+
+      isEditingMode = true;
+      editingMessageId = msgData.id;
+      editingCollectionTarget = dataCollectionTargetStr;
+
+      messageInput.value = msgData.text;
+      sendButtonElement.textContent = "Edit";
+
+      messageInput.focus();
+      messageInput.selectionStart = messageInput.selectionEnd = messageInput.value.length;
+    };
+  }
+
+  if (deleteBtn) {
+    deleteBtn.onclick = async () => {
+      try {
+        const { data: record } = await supabase.from(dataCollectionTargetStr).select("*").eq("id", msgData.id).single();
+        if (record) {
+          lastActionLog = { type: "delete", collection: dataCollectionTargetStr, id: msgData.id, data: record };
+        }
+        await supabase.from(dataCollectionTargetStr).delete().eq("id", msgData.id);
+      } catch(err) {
+        console.error("Failed to process document purge lifecycle steps:", err);
+      }
+    };
+  }
+
+  scroller.appendChild(div);
+}
+
+function getMentionSuggestionItems(searchStr = "") {
+  const normalizedSearch = (searchStr || "").toLowerCase();
+  const isAdminPlus = currentUserRole === "admin" || currentUserRole === "owner";
+  const specialItems = [
+    { username: "mod", avatar: "@", isSpecial: true },
+    ...(isAdminPlus ? [
+      { username: "everyone", avatar: "@", isSpecial: true },
+      { username: "here", avatar: "@", isSpecial: true }
+    ] : [])
+  ].filter(item => item.username.startsWith(normalizedSearch));
+
+  const filteredUsers = localUsersCache
+    .filter(u => u.username.toLowerCase().startsWith(normalizedSearch) && u.username.toLowerCase() !== currentUsername.toLowerCase())
+    .map(u => ({ ...u, isSpecial: false }));
+
+  return [...specialItems, ...filteredUsers];
+}
+
+function attachTapOrScrollHandler(element, callback) {
+  let startX = 0;
+  let startY = 0;
+
+  element.addEventListener("pointerdown", (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+  });
+
+  element.addEventListener("pointerup", (e) => {
+    const endX = e.clientX;
+    const endY = e.clientY;
+    const distance = Math.hypot(endX - startX, endY - startY);
+
+    if (distance <= 4) {
+      callback(e);
+    }
+  });
+}
+
+function setupAutocompleteEngine(input) {
+  const popover = document.getElementById("suggestions-popover");
+
+  input.addEventListener("input", () => {
+    const val = input.value;
+    const selectionStart = input.selectionStart;
+
+    if (!val) {
+      closePopover();
+      return;
+    }
+
+    const textBeforeCursor = val.substring(0, selectionStart);
+    const words = textBeforeCursor.split(/\s+/);
+    const currentWordIdx = words.length - 1;
+    const currentWord = words[currentWordIdx];
+    const wordStartIdx = textBeforeCursor.lastIndexOf(currentWord);
+
+    if (val.startsWith("/")) {
+      if (currentWordIdx === 0) {
+        const clearCommands = EX_COMMANDS.filter(c => {
+          if (["/mute", "/unmute", "/ban", "/unban", "/permaban", "/deleteall", "/kick", "/warn"].includes(c.name)) {
+            return currentUserRole === "admin" || currentUserRole === "owner";
+          }
+          if (["/admin", "/unadmin", "/owner", "/unowner", "/subscription", "/deleteuser"].includes(c.name)) {
+            return currentUserRole === "owner";
+          }
+          return true;
+        }).filter(c => c.name.toLowerCase().startsWith(val.toLowerCase()));
+
+        if (clearCommands.length > 0) {
+          showCommands(clearCommands);
+          return;
+        } else {
+          closePopover();
+          return;
+        }
+      }
+    }
+
+    const baseCommandContext = words[0].toLowerCase();
+    const targetAutocompleteCommands = ["/w", "/whisper", "/omoggle", "/privatevc", "/mute", "/unmute", "/admin", "/unadmin", "/owner", "/unowner", "/subscription", "/deleteuser", "/ban", "/unban", "/permaban", "/kick", "/warn"];
+
+    if (targetAutocompleteCommands.includes(baseCommandContext)) {
+      let isTargetingPhase = true;
+
+      if (["/mute", "/unmute", "/admin", "/unadmin", "/owner", "/unowner", "/subscription", "/deleteuser", "/ban", "/unban", "/permaban", "/kick", "/warn"].includes(baseCommandContext) && currentWordIdx > 1) {
+        isTargetingPhase = false;
+      } else {
+        for (let i = 1; i < currentWordIdx; i++) {
+          if (!words[i].startsWith("@")) {
+            isTargetingPhase = false;
+            break;
+          }
+        }
+      }
+
+      if (isTargetingPhase) {
+        let searchStr = currentWord;
+        if (searchStr.startsWith("@")) {
+          searchStr = searchStr.substring(1);
+        }
+
+        if (currentWord === words[0] || currentWord === "") {
+          searchStr = "";
+        }
+
+        const cleanSearch = searchStr.toLowerCase();
+        const filtered = getMentionSuggestionItems(cleanSearch);
+
+        if (filtered.length > 0) {
+          currentMentionTriggerIdx = wordStartIdx;
+          showMentions(filtered, currentWord === words[0] ? "command-inline" : "whisper-target");
+          return;
+        }
+      }
+    }
+
+    const lastAtIdx = val.lastIndexOf("@", selectionStart - 1);
+    if (lastAtIdx !== -1 && (lastAtIdx === 0 || /\s/.test(val[lastAtIdx - 1]))) {
+      const searchStr = val.substring(lastAtIdx + 1, selectionStart).toLowerCase();
+
+      if (!/\s/.test(searchStr)) {
+        currentMentionTriggerIdx = lastAtIdx;
+        const filtered = getMentionSuggestionItems(searchStr);
+
+        if (filtered.length > 0) {
+          showMentions(filtered, "general-mention");
+          return;
+        }
+      }
+    }
+
+    closePopover();
+  });
+
+  input.addEventListener("keydown", (e) => {
+    const items = popover.querySelectorAll(".suggestion-item");
+    if (popover.style.display === "block" && items.length > 0) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        items[activeSuggestionIndex].classList.remove("selected");
+        activeSuggestionIndex = (activeSuggestionIndex + 1) % items.length;
+        items[activeSuggestionIndex].classList.add("selected");
+        items[activeSuggestionIndex].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        items[activeSuggestionIndex].classList.remove("selected");
+        activeSuggestionIndex = (activeSuggestionIndex - 1 + items.length) % items.length;
+        items[activeSuggestionIndex].classList.add("selected");
+        items[activeSuggestionIndex].scrollIntoView({ block: "nearest" });
+      } else if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        items[activeSuggestionIndex].dispatchEvent(new Event("pointerdown"));
+        items[activeSuggestionIndex].dispatchEvent(new Event("pointerup"));
+      } else if (e.key === "Escape") {
+        closePopover();
+      }
+    } else if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      if (currentUserBannedUntil && Date.now() < currentUserBannedUntil) {
+        handleBannedUserDisplay();
+        return;
+      }
+      document.getElementById("send-message-btn").click();
+    }
+  });
+
+  document.addEventListener("pointerdown", (e) => {
+    if (e.target !== input && e.target !== popover && !popover.contains(e.target)) {
+      closePopover();
+    }
+  });
+}
+
+function showCommands(cmds) {
+  const popover = document.getElementById("suggestions-popover");
+  activeSuggestionIndex = 0;
+  popover.innerHTML = "";
+
+  cmds.forEach((c, idx) => {
+    const div = document.createElement("div");
+    div.className = "suggestion-item" + (idx === 0 ? " selected" : "");
+    div.innerHTML = `<span class="item-icon">/</span> <strong>${c.name}</strong> &nbsp; <span style="color:var(--text-muted); font-size:0.8rem;">${c.desc}</span>`;
+
+    attachTapOrScrollHandler(div, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const input = document.getElementById("message-input");
+      input.value = c.name + " ";
+      input.focus();
+      input.selectionStart = input.selectionEnd = input.value.length;
+      closePopover();
+      input.dispatchEvent(new Event("input"));
+    });
+
+    popover.appendChild(div);
+  });
+  popover.style.display = "block";
+}
+
+function showMentions(users, type) {
+  currentMentionType = type;
+  const popover = document.getElementById("suggestions-popover");
+  activeSuggestionIndex = 0;
+  popover.innerHTML = "";
+
+  users.forEach((u, idx) => {
+    const div = document.createElement("div");
+    div.className = "suggestion-item" + (idx === 0 ? " selected" : "");
+    const displayName = u.isSpecial ? `@${u.username}` : `@${u.username}`;
+    div.innerHTML = `
+      <div class="item-avatar"></div>
+      <strong>${displayName}</strong>
+    `;
+
+    if (!u.isSpecial) {
+      decorateAvatarElement(div.querySelector('.item-avatar'), u.id, u.username, u.avatar || u.username[0].toUpperCase());
+    } else {
+      const fallbackGradient = getGradient(u.username);
+      const itemAvatar = div.querySelector('.item-avatar');
+      if (itemAvatar) {
+        itemAvatar.style.background = `linear-gradient(135deg, ${fallbackGradient})`;
+        itemAvatar.textContent = u.avatar || '@';
+      }
+    }
+
+    attachTapOrScrollHandler(div, (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const input = document.getElementById("message-input");
+      const currentVal = input.value;
+      let newCursorPos = 0;
+
+      const cmdParts = currentVal.trim().split(/\s+/);
+      const routingContextCmdStr = cmdParts[0];
+
+      const mentionValue = u.username;
+      if (currentMentionType === "command-inline") {
+        input.value = routingContextCmdStr + " @" + mentionValue + " ";
+        newCursorPos = input.value.length;
+      } else if (currentMentionType === "whisper-target") {
+        const beforeWord = currentVal.substring(0, currentMentionTriggerIdx);
+        let spaceAfter = currentVal.indexOf(" ", currentMentionTriggerIdx);
+        let afterWord = spaceAfter !== -1 ? currentVal.substring(spaceAfter) : "";
+        input.value = beforeWord + "@" + mentionValue + (afterWord ? afterWord : " ");
+        newCursorPos = (beforeWord + "@" + mentionValue + " ").length;
+      } else {
+        const beforeTrigger = currentVal.substring(0, currentMentionTriggerIdx);
+        let spaceAfter = currentVal.indexOf(" ", currentMentionTriggerIdx);
+        let afterWord = spaceAfter !== -1 ? currentVal.substring(spaceAfter) : " ";
+        input.value = beforeTrigger + "@" + mentionValue + (afterWord.startsWith(" ") ? afterWord : " " + afterWord);
+        newCursorPos = (beforeTrigger + "@" + mentionValue + " ").length;
+      }
+
+      input.focus();
+      input.selectionStart = input.selectionEnd = newCursorPos;
+      closePopover();
+    });
+
+    popover.appendChild(div);
+  });
+  popover.style.display = "block";
+}
+
+function closePopover() {
+  const popover = document.getElementById("suggestions-popover");
+  if (popover) {
+    popover.style.display = "none";
+    popover.innerHTML = "";
+  }
+}
+
+async function handleScrollPagination() {
+  const scroller = document.getElementById("message-scroller");
+
+  if (scroller.scrollTop === 0 && !isLoadingMore && !allMessagesLoaded) {
+    isLoadingMore = true;
+
+    const loaderBanner = document.createElement("div");
+    loaderBanner.id = "history-loading-banner";
+    loaderBanner.style.cssText = "text-align: center; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding: 10px 0;";
+    loaderBanner.textContent = "Getting more messages...";
+    scroller.insertBefore(loaderBanner, scroller.firstChild);
+
+    const initialScrollHeight = scroller.scrollHeight;
+
+    try {
+      const { data: olderMessages } = await supabase
+        .from("messages")
+        .select("*")
+        .order("timestamp", { ascending: false })
+        .range(historyPageOffset, historyPageOffset + 19);
+
+      const existingBanner = document.getElementById("history-loading-banner");
+      if (existingBanner) existingBanner.remove();
+
+      if (!olderMessages || olderMessages.length < 20) {
+        allMessagesLoaded = true;
+      }
+
+      if (olderMessages && olderMessages.length > 0) {
+        historyPageOffset += olderMessages.length;
+        const fetchedHistorical = olderMessages.map(m => ({ ...m, isWhisper: false, isSystemMessage: m.role === "system" })).reverse();
+        dbHistoricalMessages = [...fetchedHistorical, ...dbHistoricalMessages];
+
+        renderMessages();
+        scroller.scrollTop = scroller.scrollHeight - initialScrollHeight;
+      }
+    } catch (err) {
+      console.error("Error loading older messages:", err);
+      const existingBanner = document.getElementById("history-loading-banner");
+      if (existingBanner) existingBanner.remove();
+    }
+    isLoadingMore = false;
+  }
+}
+
+function getGradient(username) {
+  const colors = ["#3b82f6, #7c3aed", "#f97316, #ec4899", "#06b6d4, #0891b2", "#10b981, #059669", "#f59e0b, #d97706"];
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) {
+    hash = username.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return colors[Math.abs(hash) % colors.length];
+}
+
+const avatarUrlCache = new Map();
+
+function loadAvatarImageForUser(userId) {
+  if (!userId) return null;
+
+  const cachedUrl = avatarUrlCache.get(userId);
+  if (cachedUrl) return cachedUrl;
+
+  const entry = avatarIndexByUserId.get(userId);
+  const avatarFileName = entry ? entry.fileName : `${userId}.jpg`;
+  const publicUrl = supabase.storage
+    .from("chat-files")
+    .getPublicUrl(`avatars/${avatarFileName}`).data.publicUrl;
+
+  avatarUrlCache.set(userId, publicUrl);
+  return publicUrl;
+}
+
+function decorateAvatarElement(element, userId, username, fallbackText) {
+  if (!element) return;
+
+  const gradient = getGradient(username || "User");
+  element.style.background = "var(--card)";
+  element.innerHTML = "";
+
+  if (!userId || !avatarIndexByUserId.has(userId)) {
+    element.style.background = `linear-gradient(135deg, ${gradient})`;
+    element.textContent = fallbackText;
+    return;
+  }
+
+  const publicUrl = loadAvatarImageForUser(userId);
+  if (!publicUrl) {
+    element.style.background = `linear-gradient(135deg, ${gradient})`;
+    element.textContent = fallbackText;
+    return;
+  }
+
+  const image = document.createElement("img");
+  image.alt = "Profile picture";
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.src = publicUrl;
+  image.onerror = () => {
+    element.innerHTML = "";
+    element.style.background = `linear-gradient(135deg, ${gradient})`;
+    element.textContent = fallbackText;
+  };
+  element.appendChild(image);
+}
+
+function escapeHtml(text) {
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+  return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+window.joinVoiceRoom = joinVoiceRoom;
+window.leaveVoiceRoom = leaveVoiceRoom;
+window.setParticipantMediaState = setParticipantMediaState;
+window.updateGridParticipantLayout = updateGridParticipantLayout;
+
+/* ── DOM READY INITIALIZATION SAFEGUARD ────────────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  // Safeguard: ensure layout calculations wait until DOM is fully parsed and rendered
+  updateLayoutDimensions();
+
+  if (isIOS) {
+    const ssBtn = document.getElementById('vc-screenshare-btn');
+    if (ssBtn) ssBtn.style.setProperty('display', 'none');
+  }
+
+  /* ── iOS VISUAL VIEWPORT & KEYBOARD EVENT BINDING ───────── */
+  if (window.visualViewport) {
+    const syncViewport = () => {
+      updateLayoutDimensions();
+    };
+
+    window.visualViewport.addEventListener('resize', syncViewport);
+    window.visualViewport.addEventListener('scroll', syncViewport);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(syncViewport, 50);
+    });
+  }
+
+  const messageInput = document.getElementById("message-input");
+  if (messageInput) {
+    messageInput.addEventListener("focus", () => {
+      // Let Safari finish opening the keyboard before measuring the visual viewport.
+      requestAnimationFrame(() => {
+        setTimeout(updateLayoutDimensions, 50);
+      });
+    });
+
+    messageInput.addEventListener("blur", () => {
+      setTimeout(updateLayoutDimensions, 50);
+    });
+  }
+
+  /* ── TOUCH SCROLLING INTERRUPTION PREVENTION ─────────────── */
+  // Prevents root elastic bouncing on non-scrollable UI backgrounds
+  // while allowing momentum flick-scrolling inside designated containers
+  document.addEventListener('touchmove', function(e) {
+    const scrollableContainer = e.target.closest('#message-scroller, #suggestions-popover, #vc-participant-grid');
+    if (scrollableContainer) return; // Allow natural scrolling inside these elements
+    
+    // Allow touch interactions on interactive elements (buttons, links, inputs)
+    const interactive = e.target.closest('button, a, input, [role="button"], .action-control-btn, .btn-duel-accept, .btn-duel-decline, .btn-upload-file, .vc-control-btn, .suggestion-item, .nav-auth-btn, .btn-primary');
+    if (interactive) return;
+    
+    e.preventDefault(); // Prevent elastic bouncing on non-scrollable backgrounds
+  }, { passive: false });
+});
+</script>
+</body>
+</html>

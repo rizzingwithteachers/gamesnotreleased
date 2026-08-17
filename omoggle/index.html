@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | RapidIdentity</title>
+  <script src="../assets/theme-loader.js"></script>
+  <link rel="stylesheet" href="../style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="peerjs.min.js"></script>
+  <style>
+    /* ── SHOWDOWN STYLE ────────────────────────────────── */
+    /* OPTIMIZATION: Configured maximum constraints and auto-scrolling to trap panels on tiny viewports seamlessly */
+    .showdown-container { max-width: 1000px; margin: 1rem auto; padding: 0 1.5rem; width: 100%; box-sizing: border-box; }
+    .showdown-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l); padding: 2rem 1.5rem; text-align: center; position: relative; overflow-y: auto; max-height: calc(100dvh - 110px); display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .view-stage { width: 100%; display: none; flex-direction: column; align-items: center; }
+    .view-stage.active { display: flex; }
+    .showdown-title { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(135deg, #fff 30%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .showdown-desc { color: var(--text-muted); max-width: 500px; margin-bottom: 1.5rem; line-height: 1.6; font-size: 0.95rem; }
+    .status-display-msg { color: #ef4444; margin-top: 1rem; font-size: 0.95rem; font-weight: 600; min-height: 1.5rem; }
+    .radar-spinner { width: 70px; height: 70px; border: 4px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 2rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .battleground { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; width: 100%; margin-bottom: 1.5rem; }
+    @media (max-height: 700px) {
+      .battleground { gap: 0.75rem; margin-bottom: 0.75rem; }
+      .showdown-title { font-size: 1.6rem; }
+      .showdown-desc { margin-bottom: 1rem; }
+    }
+    .player-slot { background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-m); aspect-ratio: 4/3; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+    .player-slot.winning { border-color: var(--accent); }
+    .player-slot video { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; z-index: 1; background: var(--surface); }
+    .player-label { position: absolute; top: 12px; left: 12px; background: rgba(0, 0, 0, 0.6); padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; z-index: 2; }
+    .player-label.opponent { left: auto; right: 12px; }
+    .live-metrics { margin-top: auto; background: rgba(0,0,0,0.6); padding: 4px 10px; border-radius: 4px; margin-bottom: 12px; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; color: var(--text-muted); z-index: 2; position: relative; }
+    .winning .live-metrics { color: var(--accent); }
+    .timer-banner { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 1rem; }
+    .scale-wrapper { width: 80%; max-width: 500px; margin: 0 auto; position: relative; }
+    .scale-labels { display: flex; justify-content: space-between; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase; }
+    .scale-track { height: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 999px; position: relative; width: 100%; }
+    .scale-center-notch { position: absolute; left: 50%; top: -4px; width: 2px; height: 16px; background: var(--text-muted); transform: translateX(-50%); }
+    .scale-needle { position: absolute; top: -6px; width: 20px; height: 20px; background: var(--accent); border: 3px solid #fff; border-radius: 50%; transform: translateX(-50%); transition: left 0.25s ease; }
+    .result-announcement { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; margin-bottom: 1rem; display: none; }
+    .action-row { margin-top: 1.5rem; display: flex; gap: 12px; }
+  </style>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <header>
+    <div class="nav-container">
+      <a href="" class="logo">CarsonGames</a>
+      <nav>
+        <ul>
+          <li><a href="../">Home</a></li>
+          <li><a href="../games/">Games</a></li>
+          <li><a href="#" class="active">Omoggle</a></li>
+          <li><a href="../chat/">Chat</a></li>
+          <li><a href="../settings/">Settings</a></li>
+          <li id="auth-button-container"></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="showdown-container">
+    <div class="showdown-card">
+      <div id="stage-lobby" class="view-stage active">
+        <h2 class="showdown-title">OMOGGLE</h2>
+        <p class="showdown-desc">COMPETE AGAINST OTHER PEOPLE TO SEE WHO HAS MORE AURA AFTER 15 SECONDS OF LIVE VIDEO</p>
+        <button id="btn-start" class="btn-primary">Find a Competitor</button>
+        <p id="lobby-msg" class="status-display-msg"></p>
+      </div>
+
+      <div id="stage-searching" class="view-stage">
+        <div class="radar-spinner"></div>
+        <h3 class="showdown-title" style="font-size: 1.8rem;">Finding Competitor...</h3>
+        <p class="showdown-desc">Searching for an available match...</p>
+        <button id="btn-cancel" class="btn-primary" style="background: var(--surface); border: 1px solid var(--border);">Cancel Search</button>
+      </div>
+
+      <div id="stage-match" class="view-stage">
+        <div id="countdown" class="timer-banner">15s</div>
+        <div class="battleground">
+          <div id="slot-user" class="player-slot">
+            <span class="player-label">You</span>
+            <video id="user-video" autoplay playsinline muted></video>
+            <div id="user-aura-val" class="live-metrics">Aura: +500</div>
+          </div>
+          <div id="slot-opponent" class="player-slot">
+            <span class="player-label opponent" id="opponent-name">Unknown</span>
+            <video id="opponent-video" autoplay playsinline></video>
+            <div id="opp-aura-val" class="live-metrics">Aura: +500</div>
+          </div>
+        </div>
+
+        <div class="scale-wrapper">
+          <div class="scale-labels">
+            <span>Your Aura</span>
+            <span>Opponent Aura</span>
+          </div>
+          <div class="scale-track">
+            <div class="scale-center-notch"></div>
+            <div id="scale-needle" class="scale-needle" style="left: 50%;"></div>
+          </div>
+        </div>
+
+        <h3 id="result-text" class="result-announcement"></h3>
+
+        <div class="action-row">
+          <button id="btn-next" class="btn-primary" style="display: none;">Next Match</button>
+          <button id="btn-exit" class="btn-primary" style="display: none; background: var(--surface); border: 1px solid var(--border);">Leave</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    let AuraEngine;
+    try {
+      const mod = await import("./auraEngine.js");
+      AuraEngine = mod.AuraEngine;
+      if (!AuraEngine || typeof AuraEngine.calculateMatchFlux !== 'function') throw new Error("Invalid AuraEngine");
+    } catch (e) {
+      console.warn("AuraEngine missing or invalid, using mock fallback.");
+      AuraEngine = {
+        calculateMatchFlux: (score) => {
+          const delta = (Math.random() - 0.5) * 8;
+          return Math.max(0, Math.min(100, score + delta));
+        }
+      };
+    }
+
+    const OUTCOME_PHRASES = {
+      wonByATon: [
+        "BRO GOT VIOLATED 💀",
+        "BRO GOT ABSOLUTELY COOKED.",
+        "INSANE AURA DIFF.",
+        "BRO GOT FARMED FOR AURA.",
+        "THAT WAS A VIOLATION 😭",
+        "YOU ATE. THEY GOT NO CRUMBS.",
+        "BRO GOT OUT-AURA'D.",
+        "ABSOLUTE AURA FARM.",
+        "THEY ARE COOKED 💀",
+        "THAT WAS NOT EVEN CLOSE."
+      ],
+      won: [
+        "W AURA 🔥",
+        "YOU COOKED.",
+        "COMMON W.",
+        "AURA DIFF.",
+        "YOU ATE THAT.",
+        "CERTIFIED W.",
+        "BRO IS LOCKED IN.",
+        "MASSIVE W.",
+        "YOU'RE COOKING.",
+        "CLEAN AURA W."
+      ],
+      barelyWon: [
+        "BARELY A W 😭",
+        "YOU LOWKEY COOKED.",
+        "THAT WAS WAY TOO CLOSE.",
+        "W BY A HAIR.",
+        "YOU CLUTCHED THAT.",
+        "THE AURA BARELY HELD.",
+        "THAT WAS CLOSE 💀",
+        "MINOR W.",
+        "YOU ALMOST SOLD.",
+        "BARELY OUT-AURA'D."
+      ],
+      tie: [
+        "AURA CHECK: TIED.",
+        "NO AURA DIFF.",
+        "BOTH OF YOU COOKED.",
+        "ACTUALLY A 50/50.",
+        "THE AURA IS IDENTICAL.",
+        "NEITHER OF YOU WON 💀",
+        "AURA DEADLOCK.",
+        "TOO CLOSE TO CALL.",
+        "EQUAL AURA.",
+        "NO ONE GOT COOKED."
+      ],
+      barelyLost: [
+        "BARELY AN L 😭",
+        "YOU ALMOST COOKED.",
+        "THAT WAS SO CLOSE.",
+        "YOU SOLD AT THE END 💀",
+        "MINOR AURA L.",
+        "YOU WERE ONE AURA POINT AWAY.",
+        "YOU ALMOST HAD IT.",
+        "THAT WAS A CLOSE L.",
+        "BRO BARELY SOLD.",
+        "JUST MISSED THE W."
+      ],
+      lost: [
+        "L AURA 💀",
+        "YOU GOT COOKED.",
+        "AURA DIFF.",
+        "BRO SOLD.",
+        "COMMON L.",
+        "YOU GOT OUT-AURA'D.",
+        "TIME TO LOCK IN.",
+        "MASSIVE AURA L.",
+        "YOU GOT VIOLATED.",
+        "BRO IS COOKED."
+      ],
+      lostByATon: [
+        "BRO GOT VIOLATED 💀",
+        "BRO GOT ABSOLUTELY COOKED.",
+        "NEGATIVE AURA IS CRAZY.",
+        "THAT WAS AN AURA DISASTER.",
+        "YOU GOT FARMED FOR AURA.",
+        "BRO SOLD THE WHOLE MATCH 😭",
+        "MASSIVE AURA L.",
+        "PLEASE LOCK IN.",
+        "THAT WAS NOT EVEN A CONTEST.",
+        "BRO GOT OBLITERATED 💀",
+        "ABSOLUTE VIOLATION.",
+        "THE AURA GAP IS INSANE."
+      ]
+    };
+
+    /* SUPABASE CONFIG */
+    const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
+    const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const stageLobby = document.getElementById('stage-lobby');
+    const stageSearching = document.getElementById('stage-searching');
+    const stageMatch = document.getElementById('stage-match');
+    const btnStart = document.getElementById('btn-start');
+    const btnCancel = document.getElementById('btn-cancel');
+    const btnNext = document.getElementById('btn-next');
+    const btnExit = document.getElementById('btn-exit');
+    const countdownText = document.getElementById('countdown');
+    const scaleNeedle = document.getElementById('scale-needle');
+    const opponentNameTag = document.getElementById('opponent-name');
+    const userSlot = document.getElementById('slot-user');
+    const opponentSlot = document.getElementById('slot-opponent');
+    const userAuraText = document.getElementById('user-aura-val');
+    const oppAuraText = document.getElementById('opp-aura-val');
+    const resultText = document.getElementById('result-text');
+    const lobbyMsg = document.getElementById('lobby-msg');
+    const userVideo = document.getElementById('user-video');
+    const opponentVideo = document.getElementById('opponent-video');
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const privateRoomId = urlParams.get('room');
+    const privateRole = urlParams.get('role');
+    const linkedHostName = urlParams.get('hostName');
+
+    let peer = null;
+    let myPeerId = null;
+    let currentConnection = null;
+    let isHost = false;
+    let activeQueueDocRef = null;
+    let queueChannel = null;
+    let inQueueProcess = false;
+    let myMediaStream = null;
+
+    let matchInterval;
+    let timerInterval;
+    let currentScore = 50;
+    let currentUserProfile = { id: null, username: "Unknown" };
+    const MAX_AURA = 1000;
+
+    function safelyStopCameraTracks() {
+      if (myMediaStream) {
+        myMediaStream.getTracks().forEach(track => {
+          track.stop();
+          console.log("Hardware track released successfully.");
+        });
+        myMediaStream = null;
+      }
+      if (userVideo) userVideo.srcObject = null;
+      if (opponentVideo) opponentVideo.srcObject = null;
+    }
+
+    async function safeAcquireCameraStream() {
+      if (myMediaStream) return true;
+      try {
+        myMediaStream = await navigator.mediaDevices.getUserMedia({
+          video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } },
+          audio: false
+        });
+        userVideo.srcObject = myMediaStream;
+        return true;
+      } catch (e) {
+        console.error("Camera acquisition failure:", e);
+        return false;
+      }
+    }
+
+    async function initPeerSession() {
+      if (peer && !peer.destroyed) return;
+
+      if (privateRoomId && privateRole === "host") {
+        myPeerId = privateRoomId;
+        isHost = true;
+        peer = new Peer(privateRoomId);
+      } else {
+        peer = new Peer();
+      }
+
+      peer.on('open', (id) => {
+        if (!privateRoomId) myPeerId = id;
+        if (privateRoomId && privateRole === "guest") executePrivateGuestHandshake();
+      });
+
+      peer.on('connection', (conn) => {
+        isHost = true;
+        setupDataChannel(conn);
+      });
+
+      peer.on('call', (incomingCall) => {
+        if (myMediaStream) {
+          incomingCall.answer(myMediaStream);
+          incomingCall.on('stream', (remoteStream) => { opponentVideo.srcObject = remoteStream; });
+        } else {
+          incomingCall.answer();
+        }
+      });
+
+      peer.on('error', (err) => {
+        console.error("PeerJS Error:", err);
+        if (err.type === 'unavailable-id') {
+          lobbyMsg.innerText = "Room ID already in use. Please try another.";
+        }
+      });
+    }
+
+    const authButtonContainer = document.getElementById('auth-button-container');
+    if (authButtonContainer) {
+      authButtonContainer.innerHTML = '';
+      authButtonContainer.style.display = 'none';
+    }
+
+    const renderAuthState = async (user) => {
+      if (!authButtonContainer) return;
+      if (!user) {
+        authButtonContainer.innerHTML = '<a href="../login/" class="nav-auth-btn">Sign In</a>';
+        authButtonContainer.style.display = '';
+        return;
+      }
+
+      currentUserProfile.id = user.id;
+      const { data: userSnap } = await supabase
+        .from("users")
+        .select("username")
+        .eq("id", user.id)
+        .single();
+
+      currentUserProfile.username = userSnap ? userSnap.username : user.email.split('@')[0];
+
+      authButtonContainer.innerHTML = '<a id="logout-btn" href="#" class="nav-auth-btn">Logout</a>';
+      authButtonContainer.style.display = '';
+      const logoutBtn = document.getElementById('logout-btn');
+      if (logoutBtn) {
+        logoutBtn.onclick = async () => {
+          safelyStopCameraTracks();
+          if (peer && !peer.destroyed) peer.destroy();
+          await supabase.auth.signOut();
+          window.location.reload();
+        };
+      }
+
+      if (privateRoomId) {
+        switchStage(stageMatch);
+        await safeAcquireCameraStream();
+        if (linkedHostName) {
+          opponentNameTag.innerText = decodeURIComponent(linkedHostName);
+        } else {
+          opponentNameTag.innerText = privateRole === "host" ? "Challenger" : "Host";
+        }
+      }
+
+      await initPeerSession();
+    };
+
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      const user = session?.user || null;
+      if (!user) {
+        authButtonContainer.innerHTML = '<a href="../login/" class="nav-auth-btn">Sign In</a>';
+        authButtonContainer.style.display = '';
+        return;
+      }
+      await renderAuthState(user);
+    });
+
+    async function executePrivateGuestHandshake() {
+      switchStage(stageMatch);
+      const videoAcquired = await safeAcquireCameraStream();
+      if (!videoAcquired) { alert("Camera access required for Omoggle duels."); return; }
+
+      isHost = false;
+      const conn = peer.connect(privateRoomId);
+      setupDataChannel(conn);
+    }
+
+    function switchStage(stage) {
+      stageLobby.classList.remove('active'); stageSearching.classList.remove('active'); stageMatch.classList.remove('active');
+      stage.classList.add('active');
+    }
+
+    async function startMatchmaking() {
+      if (privateRoomId) return;
+      if (inQueueProcess || !myPeerId) return;
+
+      if (!currentUserProfile.id) {
+        lobbyMsg.innerText = "Please sign in to queue for a match.";
+        return;
+      }
+
+      inQueueProcess = true;
+
+      const videoAcquired = await safeAcquireCameraStream();
+      if (!videoAcquired) {
+        lobbyMsg.innerText = "Camera initialization failed. Please verify browser settings.";
+        inQueueProcess = false;
+        return;
+      }
+
+      switchStage(stageSearching);
+
+      try {
+        const { data: queueItems } = await supabase
+          .from("showdown_queue")
+          .select("*")
+          .eq("status", "waiting")
+          .neq("hostuid", currentUserProfile.id)
+          .limit(5);
+
+        let selectedDoc = queueItems?.[0];
+
+        if (selectedDoc) {
+          const { data: matchedRows, error: matchError } = await supabase
+            .from("showdown_queue")
+            .update({
+              status: "matched",
+              guestpeerid: myPeerId,
+              guestuid: currentUserProfile.id,
+              guestname: currentUserProfile.username
+            })
+            .eq("id", selectedDoc.id)
+            .eq("status", "waiting")
+            .select();
+
+          if (matchError) {
+            console.error("Error updating queue row for guest:", matchError);
+          }
+
+          if (matchedRows && matchedRows.length > 0) {
+            const successData = matchedRows[0];
+            isHost = false;
+            opponentNameTag.innerText = successData.hostname || "Player";
+            setupDataChannel(peer.connect(successData.hostpeerid));
+            inQueueProcess = false;
+            return;
+          }
+        }
+
+        isHost = true;
+        const { data: newQueueItem, error: insertError } = await supabase
+          .from("showdown_queue")
+          .insert([{
+            status: "waiting",
+            hostpeerid: myPeerId,
+            hostuid: currentUserProfile.id,
+            hostname: currentUserProfile.username,
+            guestpeerid: "",
+            guestuid: null,
+            guestname: "",
+            createdat: Date.now()
+          }])
+          .select()
+          .single();
+
+        if (insertError) {
+          console.error("Failed to insert queue item:", insertError);
+          lobbyMsg.innerText = "Queue creation failed. Check console for details.";
+          inQueueProcess = false;
+          return;
+        }
+
+        if (newQueueItem) {
+          activeQueueDocRef = newQueueItem.id;
+
+          if (queueChannel) supabase.removeChannel(queueChannel);
+
+          queueChannel = supabase
+            .channel(`public:showdown_queue:id=eq.${newQueueItem.id}`)
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'showdown_queue', filter: `id=eq.${newQueueItem.id}` }, async (payload) => {
+              const d = payload.new;
+              if (d && d.status === "matched") {
+                opponentNameTag.innerText = d.guestname || "Player";
+                await supabase.from("showdown_queue").delete().eq("id", newQueueItem.id);
+                if (queueChannel) {
+                  supabase.removeChannel(queueChannel);
+                  queueChannel = null;
+                }
+              }
+            })
+            .subscribe();
+        }
+      } catch (err) {
+        console.error("Matchmaking error:", err);
+        cancelSearch();
+      }
+      inQueueProcess = false;
+    }
+
+    async function cancelSearch() {
+      if (queueChannel) {
+        supabase.removeChannel(queueChannel);
+        queueChannel = null;
+      }
+      if (isHost && activeQueueDocRef) {
+        await supabase.from("showdown_queue").delete().eq("id", activeQueueDocRef);
+        activeQueueDocRef = null;
+      }
+      if (currentConnection) {
+        currentConnection.close();
+        currentConnection = null;
+      }
+      safelyStopCameraTracks();
+      switchStage(stageLobby);
+    }
+
+    function setupDataChannel(conn) {
+      currentConnection = conn;
+
+      let connectionTimeout = setTimeout(() => {
+        if (!currentConnection?.open) {
+          console.warn("P2P Connection timeout");
+          cancelSearch();
+        }
+      }, 15000);
+
+      currentConnection.on('open', () => {
+        clearTimeout(connectionTimeout);
+        currentConnection.send({ type: 'init_name', username: currentUserProfile.username });
+
+        if (!isHost && myMediaStream) {
+          const call = peer.call(conn.peer, myMediaStream);
+          call.on('stream', (stream) => { opponentVideo.srcObject = stream; });
+        }
+        runShowdownEngine();
+      });
+
+      currentConnection.on('data', (data) => {
+        if (data.type === 'init_name') {
+          opponentNameTag.innerText = data.username;
+        }
+        if (data.type === 'sync_score') {
+          currentScore = Math.max(0, Math.min(100, Number(data.score) || 0));
+          renderUIFrames();
+        }
+      });
+
+      currentConnection.on('close', () => {
+        clearLoops();
+        safelyStopCameraTracks();
+        switchStage(stageLobby);
+      });
+
+      currentConnection.on('error', (err) => {
+        console.error("Data channel error:", err);
+        cancelSearch();
+      });
+    }
+
+    function runShowdownEngine() {
+      switchStage(stageMatch);
+      countdownText.style.display = 'block'; resultText.style.display = 'none'; btnNext.style.display = 'none'; btnExit.style.display = 'none';
+      currentScore = 50; scaleNeedle.style.left = '50%';
+
+      if (privateRoomId) {
+        btnNext.style.setProperty("display", "none", "important");
+      }
+
+      let timeLeft = 15;
+      countdownText.innerText = timeLeft + "s";
+
+      timerInterval = setInterval(() => {
+        timeLeft--; countdownText.innerText = timeLeft + "s";
+        if (timeLeft <= 0) terminateShowdown();
+      }, 1000);
+
+      matchInterval = setInterval(() => {
+        if (isHost) {
+          currentScore = Math.max(0, Math.min(100, Number(AuraEngine.calculateMatchFlux(currentScore)) || 0));
+          if (currentConnection?.open) currentConnection.send({ type: 'sync_score', score: currentScore });
+          renderUIFrames();
+        }
+      }, 350);
+    }
+
+    function renderUIFrames() {
+      currentScore = Math.max(0, Math.min(100, Number(currentScore) || 0));
+      let calculatedPos = isHost ? currentScore : (100 - currentScore);
+      calculatedPos = Math.max(0, Math.min(100, calculatedPos));
+
+      const userAura = Math.max(0, Math.min(MAX_AURA, Math.round((100 - calculatedPos) * 10)));
+      const opponentAura = Math.max(0, Math.min(MAX_AURA, Math.round(calculatedPos * 10)));
+
+      scaleNeedle.style.left = calculatedPos + '%';
+      userAuraText.innerText = `Aura: +${userAura}`;
+      oppAuraText.innerText = `Aura: +${opponentAura}`;
+
+      userSlot.className = `player-slot ${calculatedPos < 48 ? 'winning' : ''}`;
+      opponentSlot.className = `player-slot ${calculatedPos > 52 ? 'winning' : ''}`;
+    }
+
+    function terminateShowdown() {
+      clearLoops();
+      countdownText.style.display = 'none'; resultText.style.display = 'block';
+      btnExit.style.display = 'inline-block';
+      if (!privateRoomId) btnNext.style.display = 'inline-block';
+
+      let finalPosition = isHost ? currentScore : (100 - currentScore);
+      finalPosition = Math.max(0, Math.min(100, Number(finalPosition) || 0));
+
+      let phrases = OUTCOME_PHRASES.tie;
+      if (finalPosition < 20) phrases = OUTCOME_PHRASES.wonByATon;
+      else if (finalPosition < 40) phrases = OUTCOME_PHRASES.won;
+      else if (finalPosition < 48) phrases = OUTCOME_PHRASES.barelyWon;
+      else if (finalPosition > 52 && finalPosition <= 60) phrases = OUTCOME_PHRASES.barelyLost;
+      else if (finalPosition > 60 && finalPosition <= 80) phrases = OUTCOME_PHRASES.lost;
+      else if (finalPosition > 80) phrases = OUTCOME_PHRASES.lostByATon;
+
+      resultText.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+      resultText.style.color = finalPosition < 48 ? "var(--accent)" : finalPosition > 52 ? "#ef4444" : "var(--text-muted)";
+    }
+
+    function clearLoops() { clearInterval(timerInterval); clearInterval(matchInterval); }
+
+    function cleanExit() {
+      if (currentConnection) currentConnection.close();
+      if (peer && !peer.destroyed) peer.destroy();
+      clearLoops();
+      safelyStopCameraTracks();
+      window.location.href = privateRoomId ? "../chat/" : "#";
+      switchStage(stageLobby);
+    }
+
+    btnStart.addEventListener('click', startMatchmaking);
+    btnCancel.addEventListener('click', cancelSearch);
+    btnNext.addEventListener('click', async () => {
+      clearLoops();
+      safelyStopCameraTracks();
+      await startMatchmaking();
+    });
+    btnExit.addEventListener('click', cleanExit);
+
+    window.addEventListener('beforeunload', () => {
+      safelyStopCameraTracks();
+      if (peer && !peer.destroyed) peer.destroy();
+    });
+  </script>
+</body>
+</html>

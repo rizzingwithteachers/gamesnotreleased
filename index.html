@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | RapidIdentity</title>
+  <script src="assets/theme-loader.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght=700;800&family=Plus+Jakarta+Sans:wght=500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Prevent auto-scroll jumps on page load */
+    html, body {
+      scroll-behavior: auto !important;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 6rem 2rem 0;
+      background: radial-gradient(circle at top center, rgba(108,99,255,0.08) 0%, transparent 65%);
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      animation: textGlow 3s ease-in-out infinite;
+    }
+    @keyframes textGlow {
+      0%, 100% { text-shadow: 0 0 20px rgba(108, 99, 255, 0.2); }
+      50% { text-shadow: 0 0 40px rgba(108, 99, 255, 0.4); }
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #a5b4fc 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-size: 200% 200%;
+      animation: gradientShift 4s ease infinite;
+    }
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .hero p {
+      color: var(--text-muted);
+      max-width: 580px;
+      margin: 0 auto 2rem;
+      font-size: 1.1rem;
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* ── ALIGNED RECTANGLES ── */
+    .hero-billboards {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+      width: 100%;
+    }
+    .billboard-rect {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-l);
+      padding: 1.5rem 2rem;
+      width: 100%;
+      height: 260px;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      overflow: hidden;
+      will-change: transform, opacity;
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+      animation: billboardIn 0.75s var(--ease) both;
+    }
+    .billboard-rect:first-child {
+      animation-delay: 0.15s;
+    }
+    .billboard-rect:last-child {
+      animation-delay: 0.3s;
+    }
+    .billboard-rect h3 {
+      font-family: var(--font-display);
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: #fff;
+      text-align: center;
+      width: 100%;
+    }
+    .billboard-rect hr {
+      width: 100%;
+      border: 0;
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 1rem;
+    }
+    .billboard-scroll-area {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      text-align: left;
+    }
+    .billboard-scroll-area::-webkit-scrollbar { width: 4px; }
+    .billboard-scroll-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+    .billboard-scroll-area ul { list-style: none; }
+    .billboard-scroll-area li { color: #cbd5e1; font-size: 0.95rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .billboard-scroll-area li::before { content: ">"; color: var(--text-muted); font-weight: bold; }
+
+    @keyframes billboardIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 6rem;
+      width: 100%;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-l);
+      padding: 2.5rem 2rem;
+      transition: all 0.35s var(--ease);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, transparent 60%);
+      opacity: 0;
+      transition: opacity 0.35s var(--ease);
+      pointer-events: none;
+    }
+    .card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: rgba(108, 99, 255, 0.5);
+      background: var(--card-hover);
+      box-shadow: 0 24px 48px rgba(108, 99, 255, 0.2), 0 0 40px rgba(108, 99, 255, 0.1);
+    }
+    .card:hover::before { opacity: 1; }
+    .card h3 { font-family: var(--font-display); font-size: 1.4rem; margin-bottom: 0.75rem; text-align: center; }
+    .card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 2rem; text-align: center; }
+    .card .btn-primary { margin-top: auto; justify-content: center; align-self: center; }
+
+    @media (max-width: 768px) {
+      .hero-billboards { flex-direction: column; gap: 2rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero h1,
+      .hero h1 span,
+      .hero p,
+      .billboard-rect {
+        animation: none !important;
+      }
+
+      .billboard-rect {
+        opacity: 1;
+        transform: none;
+      }
+    }
+  </style>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+
+  <script>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  </script>
+
+  <header>
+    <div class="nav-container">
+      <a href="" class="logo">CarsonGames</a>
+      <nav>
+        <ul>
+          <li><a href="#" class="active">Home</a></li>
+          <li><a href="games/">Games</a></li>
+          <li><a href="omoggle/">Omoggle</a></li>
+          <li><a href="chat/">Chat</a></li>
+          <li><a href="settings/">Settings</a></li>
+          <li id="auth-button-container"></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <a href="" class="logobig">CarsonGames</a>
+    <p></p>
+    <a id="hero-signin-btn" href="login/" class="btn-primary">Sign In</a>
+  </section>
+
+  <section class="hero-billboards">
+    <div class="billboard-rect">
+      <h3>Update 3.1</h3>
+      <hr>
+      <div class="billboard-scroll-area">
+        <ul>
+          <li>Website Created</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="billboard-rect">
+      <h3>Announcements</h3>
+      <hr>
+      <div id="announcements-root" class="billboard-scroll-area">
+        <div style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding-top: 2rem;">Loading...</div>
+      </div>
+    </div>
+  </section>
+
+  <main class="grid">
+    <div class="card">
+      <h3>Games</h3>
+      <p> </p>
+      <a href="games/" class="btn-primary">Open Games</a>
+    </div>
+
+    <div class="card">
+      <h3>Omoggle</h3>
+      <p> </p>
+      <a href="omoggle/" class="btn-primary">Open Omoggle</a>
+    </div>
+
+    <div class="card">
+      <h3>Chat</h3>
+      <p> </p>
+      <a href="chat/" class="btn-primary">Open Chat</a>
+    </div>
+  </main>
+
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+    /* SUPABASE CONFIG */
+    const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
+    const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    const container = document.getElementById('auth-button-container');
+    const heroSignInBtn = document.getElementById('hero-signin-btn');
+
+    // Fast Theme Check
+    const localThemeCached = localStorage.getItem('carson_theme');
+    if (localThemeCached && localThemeCached !== 'default') {
+      document.body.className = 'theme-' + localThemeCached;
+    }
+
+    if (container) {
+      container.innerHTML = '';
+      container.style.display = 'none';
+    }
+    if (heroSignInBtn) heroSignInBtn.style.display = 'none';
+
+    const renderAuthState = async (user) => {
+      if (!container) return;
+
+      if (user) {
+        container.innerHTML = '<a id="logout-btn" href="#" class="nav-auth-btn">Logout</a>';
+        container.style.display = '';
+        if (heroSignInBtn) heroSignInBtn.style.display = 'none';
+
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+          logoutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+              await supabase.auth.signOut();
+              window.location.reload();
+            } catch (err) {
+              console.error('Logout error:', err);
+            }
+          });
+        }
+
+        const { data: profile } = await supabase.from("users").select("background").eq("id", user.id).single();
+        if (profile && profile.background) {
+          localStorage.setItem('carson_theme', profile.background);
+          document.body.className = profile.background === 'default' ? '' : 'theme-' + profile.background;
+        }
+      } else {
+        container.innerHTML = '<a href="login/" class="nav-auth-btn">Sign In</a>';
+        container.style.display = '';
+        if (heroSignInBtn) heroSignInBtn.style.display = '';
+      }
+    };
+
+      /* FETCH REAL BACKEND ANNOUNCEMENTS */
+    const loadAnnouncements = async () => {
+      const targetFeed = document.getElementById("announcements-root");
+      if (!targetFeed) return;
+
+      const { data: records, error } = await supabase
+        .from("announcements")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      // Fallback if there is a database error or if no announcements exist
+      if (error || !records || records.length === 0) {
+        if (error) console.error("Announcements DB Error:", error);
+        targetFeed.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--text-muted); font-size: 0.95rem; text-align: center; font-weight: 600;">
+            Could not load announcements
+          </div>`;
+        return;
+      }
+
+      targetFeed.innerHTML = "";
+      const ul = document.createElement("ul");
+      records.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.text;
+        ul.appendChild(li);
+      });
+      targetFeed.appendChild(ul);
+    };
+
+    // Live Realtime Listener
+    supabase
+      .channel('public:announcements')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
+        loadAnnouncements();
+      })
+      .subscribe();
+
+    supabase.auth.onAuthStateChange((event, session) => {
+      renderAuthState(session?.user || null);
+    });
+
+    loadAnnouncements();
+  </script>
+</body>
+</html>
