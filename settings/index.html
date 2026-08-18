@@ -2,1145 +2,1790 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | RapidIdentity</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="autocomplete" content="off">
+  <title>Dashboard | RapidIdentity">
+
   <script src="../assets/theme-loader.js"></script>
   <link rel="stylesheet" href="../style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght=500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="/assets/favicon.ico">
+
   <style>
-    /* ── DYNAMIC THEME CLASSES ── */
-    body {
-      transition: background 0.3s ease;
+    html,body{
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      text-rendering:optimizeLegibility;
+      -webkit-text-size-adjust:100%;
     }
 
-    .settings-hero { text-align: center; padding: 4rem 2rem 2rem; }
-    .settings-hero h1 { font-family: var(--font-display); font-size: 3rem; font-weight: 800; }
-    .settings-hero p { color: var(--text-muted); margin-top: 0.5rem; }
-
-    .settings-container { max-width: 800px; margin: 0 auto; padding: 0 2rem 6rem; width: 100%; }
-    .settings-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-l); padding: 2.5rem 2rem; display: flex; flex-direction: column; gap: 2.5rem; }
-    .settings-section { display: flex; flex-direction: column; gap: 1.25rem; }
-    .settings-section h3 { font-family: var(--font-display); font-size: 1.4rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; color: #fff; }
-    .settings-card .btn-primary {
-      background: linear-gradient(135deg, var(--accent), color-mix(in srgb, var(--accent) 72%, white));
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.02) inset;
-    }
-    .settings-card .btn-primary:hover {
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22), 0 0 18px rgba(108, 99, 255, 0.26);
-    }
-    .settings-card .btn-primary:active {
-      transform: translateY(0) scale(0.99);
-    }
-    .settings-card .btn-primary::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-      transition: left 0.5s ease;
-    }
-    .settings-card .btn-primary:hover::before {
-      left: 100%;
+    body{
+      transition:background .3s ease;
+      font-family:var(--font,"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);
     }
 
-    .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
-    .form-group label { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; }
-    .form-group input, .form-group textarea {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-m);
-      padding: 0.8rem 1rem;
-      color: #fff;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s var(--ease);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02) inset;
+    input,button,textarea,select{
+      font-family:var(--font,"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);
+      -webkit-font-smoothing:antialiased;
+      font-weight:600;
     }
-    .form-group input:focus, .form-group textarea:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
-      background: rgba(255, 255, 255, 0.06);
-    }
-    .file-input-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .form-group .avatar-file-trigger {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0.62rem 0.95rem;
-      min-height: 40px;
-      border-radius: 999px;
-      font-family: var(--font);
-      font-size: 1rem;
-      font-weight: 600;
-      color: #fff !important;
-      -webkit-text-fill-color: #fff;
-      gap: 0.45rem;
-      white-space: nowrap;
-    }
-    .form-group .avatar-file-trigger::after {
-      content: "+";
-      font-size: 1rem;
-      font-weight: 600;
-      line-height: 1;
-      color: #fff;
-    }
-    .btn-container { display: flex; justify-content: flex-end; margin-top: 0.5rem; }
 
-    /* ── PROFILE PICTURE EDITOR ── */
-    .avatar-editor-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 240px;
-      gap: 1.5rem;
-      align-items: start;
+    button,input,textarea{
+      -webkit-appearance:none;
+      appearance:none;
     }
-    .avatar-crop-stage {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      aspect-ratio: 1 / 1;
-      border-radius: 28px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
+
+    .settings-hero{
+      text-align:center;
+      padding:4rem 2rem 2rem;
+    }
+
+    .settings-hero h1{
+      font-family:var(--font-display,"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);
+      font-size:3rem;
+      line-height:1.1;
+      font-weight:800;
+      letter-spacing:-.025em;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .settings-hero p{
+      color:var(--text-muted);
+      margin-top:.5rem;
+    }
+
+    .settings-container{
+      max-width:800px;
+      margin:0 auto;
+      padding:0 2rem 6rem;
+      width:100%;
+      box-sizing:border-box;
+    }
+
+    .settings-card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius-l);
+      padding:2.5rem 2rem;
+      display:flex;
+      flex-direction:column;
+      gap:2.5rem;
+    }
+
+    .settings-section{
+      display:flex;
+      flex-direction:column;
+      gap:1.25rem;
+    }
+
+    .settings-section h3{
+      font-family:var(--font-display,"Outfit",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif);
+      font-size:1.4rem;
+      line-height:1.25;
+      font-weight:800;
+      border-bottom:1px solid var(--border);
+      padding-bottom:.5rem;
+      color:#fff;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    .settings-card .btn-primary{
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(
+        135deg,
+        var(--accent),
+        color-mix(in srgb,var(--accent) 72%,white)
+      );
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:
+        0 12px 28px rgba(0,0,0,.18),
+        0 0 0 1px rgba(255,255,255,.02) inset;
+      -webkit-font-smoothing:antialiased;
+      font-weight:700;
+    }
+
+    .settings-card .btn-primary:hover{
+      transform:translateY(-2px) scale(1.02);
+      box-shadow:
+        0 14px 30px rgba(0,0,0,.22),
+        0 0 18px rgba(108,99,255,.26);
+    }
+
+    .settings-card .btn-primary:active{
+      transform:translateY(0) scale(.99);
+    }
+
+    .settings-card .btn-primary::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-100%;
+      width:100%;
+      height:100%;
+      background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.2),
+        transparent
+      );
+      transition:left .5s ease;
+      pointer-events:none;
+    }
+
+    .settings-card .btn-primary:hover::before{
+      left:100%;
+    }
+
+    .form-group{
+      display:flex;
+      flex-direction:column;
+      gap:.5rem;
+    }
+
+    .form-group label{
+      font-size:.9rem;
+      line-height:1.3;
+      color:var(--text-muted);
+      font-weight:600;
+    }
+
+    .form-group input,
+    .form-group textarea{
+      box-sizing:border-box;
+      width:100%;
+      background:rgba(255,255,255,.04);
+      border:1px solid var(--border);
+      border-radius:var(--radius-m);
+      padding:.8rem 1rem;
+      color:#fff;
+      font-size:1rem;
+      line-height:1.4;
+      outline:none;
+      transition:
+        border-color .3s var(--ease),
+        box-shadow .3s var(--ease),
+        background .3s var(--ease);
+      box-shadow:0 1px 0 rgba(255,255,255,.02) inset;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 0 3px rgba(108,99,255,.15);
+      background:rgba(255,255,255,.06);
+    }
+
+    .form-group input:-webkit-autofill,
+    .form-group input:-webkit-autofill:hover,
+    .form-group input:-webkit-autofill:focus,
+    .form-group input:-webkit-autofill:active{
+      -webkit-text-fill-color:#fff;
+      transition:background-color 9999s ease-in-out 0s;
+    }
+
+    .file-input-hidden{
+      position:absolute;
+      width:1px;
+      height:1px;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .form-group .avatar-file-trigger{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.62rem .95rem;
+      min-height:40px;
+      border-radius:999px;
+      font-family:var(--font,"Plus Jakarta Sans",sans-serif);
+      font-size:1rem;
+      font-weight:600;
+      color:#fff!important;
+      -webkit-text-fill-color:#fff;
+      gap:.45rem;
+      white-space:nowrap;
+      cursor:pointer;
+      box-sizing:border-box;
+    }
+
+    .form-group .avatar-file-trigger::after{
+      content:"+";
+      font-size:1rem;
+      font-weight:600;
+      line-height:1;
+      color:#fff;
+    }
+
+    .btn-container{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:.5rem;
+    }
+
+    .avatar-editor-layout{
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 240px;
+      gap:1.5rem;
+      align-items:start;
+    }
+
+    .avatar-crop-stage{
+      position:relative;
+      width:100%;
+      max-width:360px;
+      aspect-ratio:1/1;
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.08);
       background:
-        radial-gradient(circle at top, rgba(108, 99, 255, 0.12), transparent 58%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+        radial-gradient(circle at top,rgba(108,99,255,.12),transparent 58%),
+        linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01)),
         var(--surface);
-      overflow: hidden;
-      user-select: none;
-      touch-action: none;
-      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24);
+      overflow:hidden;
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:none;
+      -webkit-touch-callout:none;
+      box-shadow:0 18px 44px rgba(0,0,0,.24);
     }
-    .avatar-crop-stage::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at center, rgba(0, 0, 0, 0) 0 41%, rgba(0, 0, 0, 0) 42%, rgba(0, 0, 0, 0.68) 43% 100%);
-      border-radius: inherit;
-      pointer-events: none;
-    }
-    .avatar-crop-stage::before {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 84%;
-      height: 84%;
-      transform: translate(-50%, -50%);
-      border: 2px solid rgba(255, 255, 255, 0.78);
-      border-radius: 50%;
-      box-shadow: 0 0 0 1px rgba(108, 99, 255, 0.2), 0 0 18px rgba(108, 99, 255, 0.18);
-      pointer-events: none;
-      z-index: 2;
-    }
-    .avatar-crop-image {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform-origin: center center;
-      pointer-events: none;
-      max-width: none;
-      max-height: none;
-      display: none;
-    }
-    .avatar-empty-state {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      text-align: center;
-      color: var(--text-muted);
-      padding: 1rem;
-      z-index: 1;
-    }
-    .avatar-empty-state strong {
-      color: #fff;
-      font-family: var(--font-display);
-      font-size: 1.15rem;
-    }
-    .avatar-preview-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 22px;
-      padding: 1.25rem;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
-    }
-    .avatar-preview-row {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-      min-height: 64px;
-      flex-wrap: wrap;
-    }
-    .avatar-final-preview {
-      width: 64px;
-      height: 64px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      background: var(--surface);
-      flex-shrink: 0;
-      object-fit: cover;
-      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
-    }
-    .avatar-preview-copy {
-      color: var(--text-muted);
-      font-size: 0.88rem;
-      line-height: 1.5;
-    }
-    .avatar-control-hint {
-      color: var(--text-muted);
-      font-size: 0.85rem;
-      line-height: 1.5;
-    }
-    .avatar-range {
-      width: 100%;
-      appearance: none;
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.18));
-      outline: none;
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
-    }
-    .avatar-range::-webkit-slider-runnable-track {
-      height: 10px;
-      border-radius: 999px;
+
+    .avatar-crop-stage::after{
+      content:"";
+      position:absolute;
+      inset:0;
       background:
-        linear-gradient(90deg, color-mix(in srgb, var(--accent) 76%, white), var(--accent)) 0 0 / var(--avatar-fill, 50%) 100% no-repeat,
-        linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.18));
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
-      position: relative;
-      z-index: 1;
-    }
-    .avatar-range::-webkit-slider-thumb {
-      appearance: none;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: color-mix(in srgb, var(--accent) 82%, white);
-      border: 2px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 0 0 5px rgba(108, 99, 255, 0.14), 0 8px 18px rgba(0, 0, 0, 0.28);
-      cursor: pointer;
-      position: relative;
-      margin-top: -6px;
-      z-index: 2;
-    }
-    .avatar-range::-moz-range-track {
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.18));
-      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.28);
-    }
-    .avatar-range::-moz-range-progress {
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 76%, white), var(--accent));
-    }
-    .avatar-range::-moz-range-thumb {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: color-mix(in srgb, var(--accent) 82%, white);
-      border: 2px solid rgba(255, 255, 255, 0.85);
-      box-shadow: 0 0 0 5px rgba(108, 99, 255, 0.14), 0 8px 18px rgba(0, 0, 0, 0.28);
-      cursor: pointer;
-    }
-    .avatar-range:focus-visible {
-      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
-    }
-    .avatar-range::-moz-range-track {
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,255,255,0.12), rgba(255,255,255,0.18));
-    }
-    .avatar-action-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: flex-end;
-    }
-    .avatar-action-row .btn-primary {
-      min-width: 140px;
-    }
-    .avatar-secondary-btn {
-      background: rgba(255, 255, 255, 0.04) !important;
-      border: 1px solid rgba(255, 255, 255, 0.08) !important;
-      box-shadow: none !important;
-    }
-    .avatar-secondary-btn:hover {
-      background: rgba(255, 255, 255, 0.07) !important;
-      box-shadow: none !important;
-    }
-    .avatar-preview-remove-btn {
-      min-width: 190px;
+        radial-gradient(
+          circle at center,
+          rgba(0,0,0,0) 0 41%,
+          rgba(0,0,0,0) 42%,
+          rgba(0,0,0,.68) 43% 100%
+        );
+      border-radius:inherit;
+      pointer-events:none;
     }
 
-    /* ── BACKGROUND GALLERY GRID (6 PER ROW) ── */
-    .background-grid-wrapper {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 1rem;
-      width: 100%;
-      margin-top: 0.5rem;
-    }
-    .background-thumb-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-    }
-    .thumb-canvas {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: var(--radius-m);
-      border: 2px solid var(--border);
-      background-size: cover;
-      background-position: center;
-      transition: border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), outline 0.25s var(--ease);
-      box-sizing: border-box;
-      outline: 0 solid transparent;
-      outline-offset: -2px;
-      transform: translateZ(0);
-    }
-    
-    .background-thumb-card:hover .thumb-canvas, 
-    .background-thumb-card.active .thumb-canvas {
-      border-color: var(--accent);
-      box-shadow: 0 0 12px rgba(108, 99, 255, 0.5);
+    .avatar-crop-stage::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:84%;
+      height:84%;
+      transform:translate(-50%,-50%);
+      border:2px solid rgba(255,255,255,.78);
+      border-radius:50%;
+      box-shadow:
+        0 0 0 1px rgba(108,99,255,.2),
+        0 0 18px rgba(108,99,255,.18);
+      pointer-events:none;
+      z-index:2;
     }
 
-    .thumb-label {
-      margin-top: 0.5rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      font-weight: 600;
-      text-align: center;
-      text-transform: capitalize;
-    }
-    .background-thumb-card.active .thumb-label { color: #fff; }
-
-    /* ── HEADER ROW WITH TOP-RIGHT CONTROLS ── */
-    .section-header-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.5rem;
-    }
-    .section-header-controls h3 {
-      border-bottom: none;
-      padding-bottom: 0;
-    }
-    .pm-controls {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .btn-pm {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: #fff;
-      font-weight: 800;
-      width: 34px;
-      height: 34px;
-      border-radius: var(--radius-m);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      transition: all 0.2s var(--ease);
-      user-select: none;
-    }
-    .btn-pm:hover {
-      background: var(--accent);
-      border-color: var(--accent);
-    }
-    .btn-pm-minus:hover {
-      background: #ef4444;
-      border-color: #ef4444;
+    .avatar-crop-image{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform-origin:center center;
+      pointer-events:none;
+      max-width:none;
+      max-height:none;
+      display:none;
+      user-select:none;
+      -webkit-user-select:none;
     }
 
-    .announcements-box-stack {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-      margin-top: 0.5rem;
-    }
-    .announcement-input-field {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-m);
-      padding: 0.75rem 1rem;
-      color: #fff;
-      font-size: 1rem;
-      outline: none;
-      transition: all 0.3s var(--ease);
-    }
-    .announcement-input-field:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 15px rgba(108, 99, 255, 0.15);
+    .avatar-empty-state{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:.5rem;
+      text-align:center;
+      color:var(--text-muted);
+      padding:1rem;
+      z-index:1;
     }
 
-    .status-msg { font-size: 0.9rem; margin-top: 0.5rem; }
-    .status-success { color: #4ade80; }
-    .status-error { color: #f87171; }
-    .logged-out-msg { text-align: center; padding: 3rem 0; }
+    .avatar-empty-state strong{
+      color:#fff;
+      font-family:var(--font-display,"Outfit",sans-serif);
+      font-size:1.15rem;
+      font-weight:800;
+    }
 
-    @media (max-width: 768px) {
-      .background-grid-wrapper { grid-template-columns: repeat(3, 1fr); }
+    .avatar-preview-panel{
+      display:flex;
+      flex-direction:column;
+      gap:1rem;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
+      border-radius:22px;
+      padding:1.25rem;
+      box-shadow:0 18px 40px rgba(0,0,0,.12);
+    }
+
+    .avatar-preview-row{
+      display:flex;
+      align-items:center;
+      gap:.9rem;
+      min-height:64px;
+      flex-wrap:wrap;
+    }
+
+    .avatar-final-preview{
+      width:64px;
+      height:64px;
+      border-radius:50%;
+      border:2px solid rgba(255,255,255,.12);
+      background:var(--surface);
+      flex-shrink:0;
+      object-fit:cover;
+      box-shadow:0 0 0 3px rgba(108,99,255,.15);
+    }
+
+    .avatar-preview-copy{
+      color:var(--text-muted);
+      font-size:.88rem;
+      line-height:1.5;
+    }
+
+    .avatar-control-hint{
+      color:var(--text-muted);
+      font-size:.85rem;
+      line-height:1.5;
+    }
+
+    .avatar-range{
+      width:100%;
+      appearance:none;
+      -webkit-appearance:none;
+      height:10px;
+      border-radius:999px;
+      background:linear-gradient(
+        90deg,
+        rgba(255,255,255,.12),
+        rgba(255,255,255,.18)
+      );
+      outline:none;
+      box-shadow:inset 0 1px 2px rgba(0,0,0,.28);
+    }
+
+    .avatar-range::-webkit-slider-runnable-track{
+      height:10px;
+      border-radius:999px;
+      background:
+        linear-gradient(
+          90deg,
+          color-mix(in srgb,var(--accent) 76%,white),
+          var(--accent)
+        ) 0 0/var(--avatar-fill,50%) 100% no-repeat,
+        linear-gradient(
+          90deg,
+          rgba(255,255,255,.12),
+          rgba(255,255,255,.18)
+        );
+      box-shadow:inset 0 1px 2px rgba(0,0,0,.28);
+    }
+
+    .avatar-range::-webkit-slider-thumb{
+      appearance:none;
+      -webkit-appearance:none;
+      width:22px;
+      height:22px;
+      margin-top:-6px;
+      border-radius:50%;
+      background:color-mix(in srgb,var(--accent) 82%,white);
+      border:2px solid rgba(255,255,255,.85);
+      box-shadow:
+        0 0 0 5px rgba(108,99,255,.14),
+        0 8px 18px rgba(0,0,0,.28);
+      cursor:pointer;
+    }
+
+    .avatar-range::-moz-range-track{
+      height:10px;
+      border-radius:999px;
+      background:linear-gradient(
+        90deg,
+        rgba(255,255,255,.12),
+        rgba(255,255,255,.18)
+      );
+    }
+
+    .avatar-range::-moz-range-progress{
+      height:10px;
+      border-radius:999px;
+      background:linear-gradient(
+        90deg,
+        color-mix(in srgb,var(--accent) 76%,white),
+        var(--accent)
+      );
+    }
+
+    .avatar-range::-moz-range-thumb{
+      width:22px;
+      height:22px;
+      border-radius:50%;
+      background:color-mix(in srgb,var(--accent) 82%,white);
+      border:2px solid rgba(255,255,255,.85);
+      box-shadow:
+        0 0 0 5px rgba(108,99,255,.14),
+        0 8px 18px rgba(0,0,0,.28);
+      cursor:pointer;
+    }
+
+    .avatar-range:focus-visible{
+      box-shadow:0 0 0 3px rgba(108,99,255,.2);
+    }
+
+    .avatar-action-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.75rem;
+      justify-content:flex-end;
+    }
+
+    .avatar-action-row .btn-primary{
+      min-width:140px;
+    }
+
+    .avatar-secondary-btn{
+      background:rgba(255,255,255,.04)!important;
+      border:1px solid rgba(255,255,255,.08)!important;
+      box-shadow:none!important;
+    }
+
+    .avatar-secondary-btn:hover{
+      background:rgba(255,255,255,.07)!important;
+      box-shadow:none!important;
+    }
+
+    .avatar-preview-remove-btn{
+      min-width:190px;
+    }
+
+    .background-grid-wrapper{
+      display:grid;
+      grid-template-columns:repeat(6,1fr);
+      gap:1rem;
+      width:100%;
+      margin-top:.5rem;
+    }
+
+    .background-thumb-card{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      cursor:pointer;
+      -webkit-tap-highlight-color:transparent;
+    }
+
+    .thumb-canvas{
+      width:100%;
+      aspect-ratio:1/1;
+      border-radius:var(--radius-m);
+      border:2px solid var(--border);
+      background-size:cover;
+      background-position:center;
+      transition:
+        border-color .25s var(--ease),
+        box-shadow .25s var(--ease),
+        outline .25s var(--ease);
+      box-sizing:border-box;
+      outline:0 solid transparent;
+      outline-offset:-2px;
+      transform:translateZ(0);
+    }
+
+    .background-thumb-card:hover .thumb-canvas,
+    .background-thumb-card.active .thumb-canvas{
+      border-color:var(--accent);
+      box-shadow:0 0 12px rgba(108,99,255,.5);
+    }
+
+    .thumb-label{
+      margin-top:.5rem;
+      font-size:.75rem;
+      line-height:1.3;
+      color:var(--text-muted);
+      font-weight:600;
+      text-align:center;
+      text-transform:capitalize;
+    }
+
+    .background-thumb-card.active .thumb-label{
+      color:#fff;
+    }
+
+    .section-header-controls{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid var(--border);
+      padding-bottom:.5rem;
+      gap:1rem;
+    }
+
+    .section-header-controls h3{
+      border-bottom:none;
+      padding-bottom:0;
+      margin:0;
+    }
+
+    .pm-controls{
+      display:flex;
+      gap:.5rem;
+      flex-shrink:0;
+    }
+
+    .btn-pm{
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      color:#fff;
+      font-weight:800;
+      width:34px;
+      height:34px;
+      border-radius:var(--radius-m);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:1.2rem;
+      line-height:1;
+      transition:all .2s var(--ease);
+      user-select:none;
+      -webkit-user-select:none;
+      padding:0;
+    }
+
+    .btn-pm:hover{
+      background:var(--accent);
+      border-color:var(--accent);
+    }
+
+    .btn-pm-minus:hover{
+      background:#ef4444;
+      border-color:#ef4444;
+    }
+
+    .announcements-box-stack{
+      display:flex;
+      flex-direction:column;
+      gap:.75rem;
+      margin-top:.5rem;
+    }
+
+    .announcement-input-field{
+      width:100%;
+      box-sizing:border-box;
+      background:rgba(255,255,255,.03);
+      border:1px solid var(--border);
+      border-radius:var(--radius-m);
+      padding:.75rem 1rem;
+      color:#fff;
+      font-size:1rem;
+      line-height:1.4;
+      outline:none;
+      transition:all .3s var(--ease);
+    }
+
+    .announcement-input-field:focus{
+      border-color:var(--accent);
+      box-shadow:0 0 15px rgba(108,99,255,.15);
+    }
+
+    .status-msg{
+      font-size:.9rem;
+      line-height:1.4;
+      margin-top:.5rem;
+    }
+
+    .status-success{color:#4ade80}
+    .status-error{color:#f87171}
+
+    .logged-out-msg{
+      text-align:center;
+      padding:3rem 0;
+    }
+
+    @media(max-width:768px){
+      .settings-hero{
+        padding:3rem 1.25rem 1.5rem;
+      }
+
+      .settings-hero h1{
+        font-size:2.4rem;
+      }
+
+      .settings-container{
+        padding-left:1rem;
+        padding-right:1rem;
+      }
+
+      .settings-card{
+        padding:1.5rem 1rem;
+      }
+
+      .background-grid-wrapper{
+        grid-template-columns:repeat(3,1fr);
+        gap:.75rem;
+      }
+
+      .avatar-editor-layout{
+        grid-template-columns:1fr;
+      }
+
+      .avatar-crop-stage{
+        max-width:100%;
+      }
+
+      .avatar-preview-panel{
+        width:100%;
+        box-sizing:border-box;
+      }
+
+      .btn-container{
+        justify-content:stretch;
+      }
+
+      .btn-container .btn-primary{
+        width:100%;
+      }
+    }
+
+    @media(max-width:480px){
+      .settings-hero h1{
+        font-size:2rem;
+      }
+
+      .settings-section h3{
+        font-size:1.25rem;
+      }
+
+      .avatar-action-row{
+        flex-direction:column;
+      }
+
+      .avatar-action-row .btn-primary{
+        width:100%;
+      }
     }
   </style>
-  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
+
 <body>
 
-  <header>
-    <div class="nav-container">
-      <a href="../" class="logo">CarsonGames</a>
-      <nav>
-        <ul>
-          <li><a href="../">Home</a></li>
-          <li><a href="../games/">Games</a></li>
-          <li><a href="../omoggle/">Omoggle</a></li>
-          <li><a href="../chat/">Chat</a></li>
-          <li><a href="#" class="active">Settings</a></li>
-          <li id="auth-button-container"></li>
-        </ul>
-      </nav>
+<header>
+  <div class="nav-container">
+    <a href="../" class="logo">CarsonGames</a>
+    <nav>
+      <ul>
+        <li><a href="../">Home</a></li>
+        <li><a href="../games/">Games</a></li>
+        <li><a href="../omoggle/">Omoggle</a></li>
+        <li><a href="../chat/">Chat</a></li>
+        <li><a href="#" class="active">Settings</a></li>
+        <li id="auth-button-container"></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<section class="settings-hero">
+  <h1>Account Settings</h1>
+  <p>Change your configuration and interface options</p>
+</section>
+
+<main class="settings-container">
+  <div id="settings-wrapper" class="settings-card">
+    <div class="logged-out-msg">
+      <p>Please sign in to view and change your settings.</p>
+      <br>
+      <a href="../login/" class="btn-primary">Sign In</a>
     </div>
-  </header>
+  </div>
+</main>
 
-  <section class="settings-hero">
-    <h1>Account Settings</h1>
-    <p>Change your configuration and interface options</p>
-  </section>
+<script type="module">
+import{createClient}from"https://esm.sh/@supabase/supabase-js@2";
 
-  <main class="settings-container">
-    <div id="settings-wrapper" class="settings-card">
-      <div class="logged-out-msg">
-        <p>Please sign in to view and change your settings.</p>
-        <br>
-        <a href="../login/" class="btn-primary">Sign In</a>
+const supabase=createClient(
+  "https://hbynnertatvxpvtqctyg.supabase.co",
+  "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C".replace("OStOzeQ","OStOzeQ")
+);
+
+const settingsWrapper=document.getElementById("settings-wrapper");
+const navAuthContainer=document.getElementById("auth-button-container");
+let settingsRenderToken=0;
+
+const THEME_DATA_MAP=[
+  {id:"default",type:"color",val:"#06060c",label:"default"},
+  {id:"red",type:"color",val:"#1c0505",label:"red"},
+  {id:"orange",type:"color",val:"#1c0f05",label:"orange"},
+  {id:"yellow",type:"color",val:"#161402",label:"yellow"},
+  {id:"green",type:"color",val:"#03140a",label:"green"},
+  {id:"blue",type:"color",val:"#030a1c",label:"blue"},
+  {id:"purple",type:"color",val:"#0f031c",label:"purple"},
+  {id:"stars",type:"img",val:"../assets/stars.svg",label:"stars"},
+  {id:"teal-magenta",type:"img",val:"../assets/teal-magenta.png",label:"teal + magenta"},
+  {id:"blue-pink",type:"img",val:"../assets/blue-pink.png",label:"blue + pink"},
+  {id:"white-spots",type:"img",val:"../assets/white-spots.png",label:"white spots"}
+];
+
+function escapeHTML(value){
+  return String(value??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function getGradient(username){
+  const colors=[
+    ["#3b82f6","#7c3aed"],
+    ["#f97316","#ec4899"],
+    ["#06b6d4","#0891b2"],
+    ["#10b981","#059669"],
+    ["#f59e0b","#d97706"]
+  ];
+
+  let hash=0;
+  for(let i=0;i<username.length;i++){
+    hash=username.charCodeAt(i)+((hash<<5)-hash);
+  }
+
+  return colors[Math.abs(hash)%colors.length];
+}
+
+function drawFallbackPreview(canvasEl,name){
+  const context=canvasEl.getContext("2d");
+  const [startColor,endColor]=getGradient(name);
+
+  context.clearRect(0,0,canvasEl.width,canvasEl.height);
+
+  const gradient=context.createLinearGradient(
+    0,0,canvasEl.width,canvasEl.height
+  );
+
+  gradient.addColorStop(0,startColor);
+  gradient.addColorStop(1,endColor);
+
+  context.fillStyle=gradient;
+  context.fillRect(0,0,canvasEl.width,canvasEl.height);
+
+  context.fillStyle="#fff";
+  context.font="800 30px Outfit,Arial,sans-serif";
+  context.textAlign="center";
+  context.textBaseline="middle";
+  context.fillText(
+    name.charAt(0).toUpperCase(),
+    canvasEl.width/2,
+    canvasEl.height/2+1
+  );
+}
+
+async function getLatestAvatarPathForUser(userId){
+  const{data,error}=await supabase.storage
+    .from("chat-files")
+    .list("avatars",{
+      limit:1000,
+      sortBy:{column:"name",order:"desc"}
+    });
+
+  if(error||!data)return"";
+
+  let latestFileName="";
+  let latestTimestamp=-1;
+
+  data.forEach(item=>{
+    if(!item.name||!item.name.startsWith(`${userId}__`))return;
+
+    const timestampPart=item.name.split("__")[1]||"";
+    const parsedTimestamp=parseInt(timestampPart,10);
+
+    if(!Number.isFinite(parsedTimestamp))return;
+
+    if(parsedTimestamp>latestTimestamp){
+      latestTimestamp=parsedTimestamp;
+      latestFileName=item.name;
+    }
+  });
+
+  return latestFileName?`avatars/${latestFileName}`:"";
+}
+
+function getAvatarPublicUrl(storagePath){
+  if(!storagePath)return"";
+  return supabase.storage.from("chat-files").getPublicUrl(storagePath).data.publicUrl;
+}
+
+function loadImageFromUrl(url){
+  return fetch(url,{cache:"no-store"})
+    .then(response=>{
+      if(!response.ok)throw new Error("Avatar file not found");
+      return response.blob();
+    })
+    .then(blob=>new Promise((resolve,reject)=>{
+      const objectUrl=URL.createObjectURL(blob);
+      const img=new Image();
+
+      img.onload=()=>{
+        URL.revokeObjectURL(objectUrl);
+        resolve(img);
+      };
+
+      img.onerror=error=>{
+        URL.revokeObjectURL(objectUrl);
+        reject(error);
+      };
+
+      img.src=objectUrl;
+    }));
+}
+
+async function clearStoredAvatar(user){
+  const filesToRemove=[`avatars/${user.id}.jpg`];
+
+  const{data,error}=await supabase.storage
+    .from("chat-files")
+    .list("avatars",{
+      limit:1000,
+      sortBy:{column:"name",order:"desc"}
+    });
+
+  if(error)throw error;
+
+  (data||[])
+    .map(item=>item.name)
+    .filter(name=>name&&name.startsWith(`${user.id}__`))
+    .forEach(name=>filesToRemove.push(`avatars/${name}`));
+
+  const{error:removeError}=await supabase.storage
+    .from("chat-files")
+    .remove(filesToRemove);
+
+  if(removeError)throw removeError;
+}
+
+async function loadAndPopulateAnnouncements(){
+  const stack=document.getElementById("announcements-stack");
+  if(!stack)return;
+
+  const{data:records,error}=await supabase
+    .from("announcements")
+    .select("*")
+    .order("created_at",{ascending:true});
+
+  stack.innerHTML="";
+
+  if(error){
+    stack.innerHTML=`<div style="color:#ef4444;font-size:.9rem">Error loading entries: ${escapeHTML(error.message)}</div>`;
+    return;
+  }
+
+  if(!records||records.length===0){
+    const input=document.createElement("input");
+    input.type="text";
+    input.className="announcement-input-field";
+    input.placeholder="Type announcement text...";
+    input.autocomplete="off";
+    stack.appendChild(input);
+    return;
+  }
+
+  records.forEach(item=>{
+    const input=document.createElement("input");
+    input.type="text";
+    input.className="announcement-input-field";
+    input.value=item.text||"";
+    input.placeholder="Type announcement text...";
+    input.autocomplete="off";
+    stack.appendChild(input);
+  });
+}
+
+async function renderSettingsInterface(user){
+  if(!user)return;
+
+  const currentRenderToken=++settingsRenderToken;
+
+  navAuthContainer.innerHTML='<a id="logout-btn" href="#" class="nav-auth-btn">Logout</a>';
+  navAuthContainer.style.display="";
+
+  const{data:profile}=await supabase
+    .from("users")
+    .select("*")
+    .eq("id",user.id)
+    .single();
+
+  const currentBgSetting=profile?.background||"default";
+  const currentUserRole=profile?.role||"user";
+  const avatarSourceName=profile?.username||user.email||"User";
+
+  window.CarsonGamesTheme?.apply(currentBgSetting);
+
+  settingsWrapper.innerHTML=`
+    <form id="username-form" class="settings-section" autocomplete="off">
+      <h3>Change Username</h3>
+
+      <div class="form-group">
+        <label for="username">New Username</label>
+        <input
+          type="text"
+          id="username"
+          name="carson-new-username"
+          value="${escapeHTML(profile?.username||"")}"
+          autocomplete="off"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          readonly
+          required
+        >
+      </div>
+
+      <div class="btn-container">
+        <button type="submit" class="btn-primary">Update Username</button>
+      </div>
+
+      <div id="username-msg" class="status-msg"></div>
+    </form>
+
+    <form id="password-form" class="settings-section" autocomplete="off">
+      <h3>Change Password</h3>
+
+      <div class="form-group">
+        <label for="new-password">New Password</label>
+        <input
+          type="password"
+          id="new-password"
+          name="carson-new-password"
+          placeholder="Enter new password"
+          autocomplete="new-password"
+          readonly
+          required
+          minlength="6"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-password">Confirm New Password</label>
+        <input
+          type="password"
+          id="confirm-password"
+          name="carson-confirm-password"
+          placeholder="Confirm new password"
+          autocomplete="new-password"
+          readonly
+          required
+          minlength="6"
+        >
+      </div>
+
+      <div class="btn-container">
+        <button type="submit" class="btn-primary">Update Password</button>
+      </div>
+
+      <div id="password-msg" class="status-msg"></div>
+    </form>
+
+    <div class="settings-section">
+      <h3>Profile Picture</h3>
+
+      <div class="avatar-editor-layout">
+        <div>
+          <div id="avatar-crop-stage" class="avatar-crop-stage">
+            <img
+              id="avatar-crop-image"
+              class="avatar-crop-image"
+              alt="Profile picture crop preview"
+              draggable="false"
+            >
+
+            <div id="avatar-empty-state" class="avatar-empty-state">
+              <strong>No picture selected</strong>
+              <span>Choose an image to crop it before saving.</span>
+            </div>
+          </div>
+
+          <p class="avatar-control-hint" style="margin-top:.75rem">
+            Drag the image to choose the crop area. Use the zoom slider to frame it.
+          </p>
+        </div>
+
+        <div class="avatar-preview-panel">
+          <div class="avatar-preview-row">
+            <canvas
+              id="avatar-output-canvas"
+              width="64"
+              height="64"
+              class="avatar-final-preview"
+            ></canvas>
+
+            <button
+              type="button"
+              id="avatar-remove-btn"
+              class="btn-primary avatar-secondary-btn avatar-preview-remove-btn"
+            >
+              Remove Profile Picture
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label for="avatar-input">Choose a new picture</label>
+
+            <input
+              type="file"
+              id="avatar-input"
+              class="file-input-hidden"
+              accept="image/*"
+            >
+
+            <label
+              for="avatar-input"
+              class="btn-primary avatar-file-trigger"
+            >
+              Choose File
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label for="avatar-zoom">Zoom</label>
+
+            <input
+              type="range"
+              id="avatar-zoom"
+              class="avatar-range"
+              min="1"
+              max="3"
+              step=".01"
+              value="1"
+            >
+          </div>
+
+          <div class="avatar-action-row">
+            <button
+              type="button"
+              id="avatar-reset-btn"
+              class="btn-primary avatar-secondary-btn"
+            >
+              Reset Crop
+            </button>
+
+            <button
+              type="button"
+              id="avatar-save-btn"
+              class="btn-primary"
+              disabled
+            >
+              Save Profile Picture
+            </button>
+          </div>
+
+          <div id="avatar-msg" class="status-msg"></div>
+        </div>
       </div>
     </div>
-  </main>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    <div class="settings-section">
+      <h3>Background Gallery</h3>
+      <div class="background-grid-wrapper" id="thumb-matrix-target"></div>
+      <div id="background-msg" class="status-msg"></div>
+    </div>
 
-    /* SUPABASE CONFIG */
-    const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
-    const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    <div id="owner-panel-injection-point"></div>
+  `;
 
-    const settingsWrapper = document.getElementById('settings-wrapper');
-    const navAuthContainer = document.getElementById('auth-button-container');
-    let settingsRenderToken = 0;
+  /* Prevent Safari/iPad password managers from filling settings fields. */
+  const usernameInput=document.getElementById("username");
+  const newPassword=document.getElementById("new-password");
+  const confirmPassword=document.getElementById("confirm-password");
 
-    const localThemeCached = localStorage.getItem('carson_theme');
-    if (localThemeCached && localThemeCached !== 'default') {
-      document.body.className = 'theme-' + localThemeCached;
+  const unlockField=field=>{
+    if(!field)return;
+    field.readOnly=false;
+  };
+
+  [usernameInput,newPassword,confirmPassword].forEach(field=>{
+    field?.addEventListener("pointerdown",()=>unlockField(field),{once:true});
+    field?.addEventListener("focus",()=>unlockField(field),{once:true});
+  });
+
+  const avatarInput=document.getElementById("avatar-input");
+  const avatarCropStage=document.getElementById("avatar-crop-stage");
+  const avatarCropImage=document.getElementById("avatar-crop-image");
+  const avatarOutputCanvas=document.getElementById("avatar-output-canvas");
+  const avatarZoomInput=document.getElementById("avatar-zoom");
+  const avatarResetBtn=document.getElementById("avatar-reset-btn");
+  const avatarRemoveBtn=document.getElementById("avatar-remove-btn");
+  const saveAvatarBtn=document.getElementById("avatar-save-btn");
+  const avatarMsg=document.getElementById("avatar-msg");
+  const avatarEmptyState=document.getElementById("avatar-empty-state");
+  const avatarOutputContext=avatarOutputCanvas.getContext("2d");
+
+  const avatarState={
+    image:null,
+    imageUrl:"",
+    baseScale:1,
+    zoom:1,
+    offsetX:0,
+    offsetY:0,
+    startX:0,
+    startY:0,
+    dragOffsetX:0,
+    dragOffsetY:0,
+    isDragging:false,
+    dirty:false
+  };
+
+  function getAvatarStageSize(){
+    return avatarCropStage?.clientWidth||360;
+  }
+
+  function clampAvatarOffsets(offsetX,offsetY,renderScale){
+    if(!avatarState.image)return{offsetX:0,offsetY:0};
+
+    const stageSize=getAvatarStageSize();
+    const renderedWidth=avatarState.image.naturalWidth*renderScale;
+    const renderedHeight=avatarState.image.naturalHeight*renderScale;
+
+    const maxOffsetX=Math.max(0,(renderedWidth-stageSize)/2);
+    const maxOffsetY=Math.max(0,(renderedHeight-stageSize)/2);
+
+    return{
+      offsetX:Math.max(-maxOffsetX,Math.min(maxOffsetX,offsetX)),
+      offsetY:Math.max(-maxOffsetY,Math.min(maxOffsetY,offsetY))
+    };
+  }
+
+  function renderAvatarPreview(){
+    if(!avatarState.image){
+      avatarCropImage.style.display="none";
+      avatarEmptyState.style.display="flex";
+      drawFallbackPreview(avatarOutputCanvas,avatarSourceName);
+      saveAvatarBtn.disabled=true;
+      avatarZoomInput.style.setProperty("--avatar-fill","0%");
+      return;
     }
 
-    const THEME_DATA_MAP = [
-      { id: 'default', type: 'color', val: '#06060c', label: 'default' },
-      { id: 'red', type: 'color', val: '#1c0505', label: 'red' },
-      { id: 'orange', type: 'color', val: '#1c0f05', label: 'orange' },
-      { id: 'yellow', type: 'color', val: '#161402', label: 'yellow' },
-      { id: 'green', type: 'color', val: '#03140a', label: 'green' },
-      { id: 'blue', type: 'color', val: '#030a1c', label: 'blue' },
-      { id: 'purple', type: 'color', val: '#0f031c', label: 'purple' },
-      { id: 'stars', type: 'img', val: '../assets/stars.svg', label: 'stars' },
-      { id: 'teal-magenta', type: 'img', val: '../assets/teal-magenta.png', label: 'teal + magenta' },
-      { id: 'blue-pink', type: 'img', val: '../assets/blue-pink.png', label: 'blue + pink' },
-      { id: 'white-spots', type: 'img', val: '../assets/white-spots.png', label: 'white spots' }
-    ];
-
-    const renderSettingsInterface = async (user) => {
-      if (!user) return;
-      const currentRenderToken = ++settingsRenderToken;
-
-      navAuthContainer.innerHTML = '<a id="logout-btn" href="#" class="nav-auth-btn">Logout</a>';
-      navAuthContainer.style.display = '';
-
-      const { data: profile } = await supabase.from("users").select("*").eq("id", user.id).single();
-      const currentBgSetting = (profile && profile.background) ? profile.background : 'default';
-      const currentUserRole = (profile && profile.role) ? profile.role : 'user';
-      const avatarSourceName = profile?.username || user.email || 'User';
-
-      window.CarsonGamesTheme.apply(currentBgSetting);
-
-      async function getLatestAvatarPathForUser(userId) {
-        const { data, error } = await supabase.storage.from('chat-files').list('avatars', {
-          limit: 1000,
-          sortBy: { column: 'name', order: 'desc' }
-        });
-
-        if (error || !data) return '';
-
-        let latestFileName = '';
-        let latestTimestamp = -1;
-
-        data.forEach(item => {
-          if (!item.name || !item.name.startsWith(`${userId}__`)) return;
-          const timestampPart = item.name.split('__')[1] || '';
-          const parsedTimestamp = parseInt(timestampPart, 10);
-          if (!Number.isFinite(parsedTimestamp)) return;
-          if (parsedTimestamp > latestTimestamp) {
-            latestTimestamp = parsedTimestamp;
-            latestFileName = item.name;
-          }
-        });
-
-        return latestFileName ? `avatars/${latestFileName}` : '';
-      }
-
-      function getAvatarPublicUrl(storagePath) {
-        if (!storagePath) return '';
-        const { data } = supabase.storage.from('chat-files').getPublicUrl(storagePath);
-        return data.publicUrl;
-      }
-
-      function loadImageFromUrl(url) {
-        return fetch(url, { cache: 'no-store' })
-          .then(response => {
-            if (!response.ok) throw new Error('Avatar file not found');
-            return response.blob();
-          })
-          .then(blob => new Promise((resolve, reject) => {
-            const objectUrl = URL.createObjectURL(blob);
-            const img = new Image();
-            img.onload = () => {
-              URL.revokeObjectURL(objectUrl);
-              resolve(img);
-            };
-            img.onerror = (error) => {
-              URL.revokeObjectURL(objectUrl);
-              reject(error);
-            };
-            img.src = objectUrl;
-          }));
-      }
-
-      function drawFallbackPreview(canvasEl) {
-        const context = canvasEl.getContext('2d');
-        const gradient = context.createLinearGradient(0, 0, canvasEl.width, canvasEl.height);
-        gradient.addColorStop(0, '#3b82f6');
-        gradient.addColorStop(1, '#7c3aed');
-        context.clearRect(0, 0, canvasEl.width, canvasEl.height);
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, canvasEl.width, canvasEl.height);
-        context.fillStyle = '#6c63ff';
-        context.font = '800 30px Outfit, sans-serif';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillText(avatarSourceName.charAt(0).toUpperCase(), canvasEl.width / 2, canvasEl.height / 2 + 1);
-      }
-
-      settingsWrapper.innerHTML = `
-        <form id="username-form" class="settings-section">
-          <h3>Change Username</h3>
-          <div class="form-group">
-            <label for="username">New Username</label>
-            <input type="text" id="username" value="${profile?.username || ''}" required>
-          </div>
-          <div class="btn-container"><button type="submit" class="btn-primary">Update Username</button></div>
-          <div id="username-msg" class="status-msg"></div>
-        </form>
-
-        <form id="password-form" class="settings-section">
-          <h3>Change Password</h3>
-          <div class="form-group">
-            <label for="new-password">New Password</label>
-            <input type="password" id="new-password" placeholder="Enter new password" required minlength="6">
-          </div>
-          <div class="form-group">
-            <label for="confirm-password">Confirm New Password</label>
-            <input type="password" id="confirm-password" placeholder="Confirm new password" required minlength="6">
-          </div>
-          <div class="btn-container"><button type="submit" class="btn-primary">Update Password</button></div>
-          <div id="password-msg" class="status-msg"></div>
-        </form>
-
-        <div class="settings-section">
-          <h3>Profile Picture</h3>
-          <div class="avatar-editor-layout">
-            <div>
-              <div id="avatar-crop-stage" class="avatar-crop-stage">
-                <img id="avatar-crop-image" class="avatar-crop-image" alt="Profile picture crop preview">
-                <div id="avatar-empty-state" class="avatar-empty-state">
-                  <strong>No picture selected</strong>
-                  <span>Choose an image to crop it before saving.</span>
-                </div>
-              </div>
-              <p class="avatar-control-hint" style="margin-top: 0.75rem;">
-                Drag the image to choose the crop area. Use the zoom slider to frame it.
-              </p>
-            </div>
-
-            <div class="avatar-preview-panel">
-              <div class="avatar-preview-row">
-                <canvas id="avatar-output-canvas" width="64" height="64" class="avatar-final-preview"></canvas>
-                <button type="button" id="avatar-remove-btn" class="btn-primary avatar-secondary-btn avatar-preview-remove-btn">Remove Profile Picture</button>
-              </div>
-
-              <div class="form-group">
-                <label for="avatar-input">Choose a new picture</label>
-                <input type="file" id="avatar-input" class="file-input-hidden" accept="image/*">
-                <label for="avatar-input" class="btn-primary avatar-file-trigger">Choose File</label>
-              </div>
-
-              <div class="form-group">
-                <label for="avatar-zoom">Zoom</label>
-                <input type="range" id="avatar-zoom" class="avatar-range" min="1" max="3" step="0.01" value="1">
-              </div>
-
-              <div class="avatar-action-row">
-                <button type="button" id="avatar-reset-btn" class="btn-primary avatar-secondary-btn">Reset Crop</button>
-                <button type="button" id="avatar-save-btn" class="btn-primary" disabled>Save Profile Picture</button>
-              </div>
-
-              <div id="avatar-msg" class="status-msg"></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <h3>Background Gallery</h3>
-          <div class="background-grid-wrapper" id="thumb-matrix-target"></div>
-          <div id="background-msg" class="status-msg"></div>
-        </div>
-
-        <div id="owner-panel-injection-point"></div>
-      `;
-
-      const avatarInput = document.getElementById('avatar-input');
-      const avatarCropStage = document.getElementById('avatar-crop-stage');
-      const avatarCropImage = document.getElementById('avatar-crop-image');
-      const avatarOutputCanvas = document.getElementById('avatar-output-canvas');
-      const avatarZoomInput = document.getElementById('avatar-zoom');
-      const avatarResetBtn = document.getElementById('avatar-reset-btn');
-      const avatarRemoveBtn = document.getElementById('avatar-remove-btn');
-      const saveAvatarBtn = document.getElementById('avatar-save-btn');
-      const avatarMsg = document.getElementById('avatar-msg');
-      const avatarEmptyState = document.getElementById('avatar-empty-state');
-      const avatarOutputContext = avatarOutputCanvas.getContext('2d');
-      const avatarState = {
-        image: null,
-        imageUrl: '',
-        baseScale: 1,
-        zoom: 1,
-        offsetX: 0,
-        offsetY: 0,
-        startX: 0,
-        startY: 0,
-        dragOffsetX: 0,
-        dragOffsetY: 0,
-        isDragging: false,
-        dirty: false
-      };
-
-      function getAvatarStageSize() {
-        return avatarCropStage?.clientWidth || 360;
-      }
-
-      function getGradient(username) {
-        const colors = ['#3b82f6, #7c3aed', '#f97316, #ec4899', '#06b6d4, #0891b2', '#10b981, #059669', '#f59e0b, #d97706'];
-        let hash = 0;
-        for (let i = 0; i < username.length; i++) {
-          hash = username.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        return colors[Math.abs(hash) % colors.length];
-      }
-
-      function drawFallbackPreview(canvasEl) {
-        const context = canvasEl.getContext('2d');
-        const gradient = getGradient(avatarSourceName);
-        context.clearRect(0, 0, canvasEl.width, canvasEl.height);
-        const gradientFill = context.createLinearGradient(0, 0, canvasEl.width, canvasEl.height);
-        const [startColor, endColor] = gradient.split(',');
-        gradientFill.addColorStop(0, startColor.trim());
-        gradientFill.addColorStop(1, endColor.trim());
-        context.fillStyle = gradientFill;
-        context.fillRect(0, 0, canvasEl.width, canvasEl.height);
-        context.fillStyle = '#6c63ff';
-        context.font = '800 30px Outfit, sans-serif';
-        context.textAlign = 'center';
-        context.textBaseline = 'middle';
-        context.fillText(avatarSourceName.charAt(0).toUpperCase(), canvasEl.width / 2, canvasEl.height / 2 + 1);
-      }
-
-      async function clearStoredAvatar() {
-        const filesToRemove = [`avatars/${user.id}.jpg`];
-
-        const { data, error } = await supabase.storage.from('chat-files').list('avatars', {
-          limit: 1000,
-          sortBy: { column: 'name', order: 'desc' }
-        });
-
-        if (error) throw error;
-
-        (data || [])
-          .map(item => item.name)
-          .filter(name => name && name.startsWith(`${user.id}__`))
-          .forEach(name => filesToRemove.push(`avatars/${name}`));
-
-        const { error: removeError } = await supabase.storage.from('chat-files').remove(filesToRemove);
-        if (removeError) throw removeError;
-      }
-
-      function clampAvatarOffsets(offsetX, offsetY, renderScale) {
-        if (!avatarState.image) return { offsetX: 0, offsetY: 0 };
-
-        const stageSize = getAvatarStageSize();
-        const renderedWidth = avatarState.image.naturalWidth * renderScale;
-        const renderedHeight = avatarState.image.naturalHeight * renderScale;
-        const maxOffsetX = Math.max(0, (renderedWidth - stageSize) / 2);
-        const maxOffsetY = Math.max(0, (renderedHeight - stageSize) / 2);
-
-        return {
-          offsetX: Math.max(-maxOffsetX, Math.min(maxOffsetX, offsetX)),
-          offsetY: Math.max(-maxOffsetY, Math.min(maxOffsetY, offsetY))
-        };
-      }
-
-      function renderAvatarPreview() {
-        if (!avatarState.image) {
-          avatarCropImage.style.display = 'none';
-          avatarEmptyState.style.display = 'flex';
-          drawFallbackPreview(avatarOutputCanvas);
-          saveAvatarBtn.disabled = true;
-          avatarZoomInput.style.setProperty('--avatar-fill', '0%');
-          return;
-        }
-
-        const stageSize = getAvatarStageSize();
-        const renderScale = avatarState.baseScale * avatarState.zoom;
-        const zoomRange = Number(avatarZoomInput.max || 3) - Number(avatarZoomInput.min || 1);
-        const zoomFill = zoomRange > 0 ? ((avatarState.zoom - Number(avatarZoomInput.min || 1)) / zoomRange) * 100 : 0;
-        avatarZoomInput.style.setProperty('--avatar-fill', `${Math.max(0, Math.min(100, zoomFill))}%`);
-        const clampedOffsets = clampAvatarOffsets(avatarState.offsetX, avatarState.offsetY, renderScale);
-        avatarState.offsetX = clampedOffsets.offsetX;
-        avatarState.offsetY = clampedOffsets.offsetY;
-
-        avatarCropImage.src = avatarState.imageUrl;
-        avatarCropImage.style.display = 'block';
-        avatarCropImage.style.width = `${avatarState.image.naturalWidth * renderScale}px`;
-        avatarCropImage.style.height = `${avatarState.image.naturalHeight * renderScale}px`;
-        avatarCropImage.style.transform = `translate(calc(-50% + ${avatarState.offsetX}px), calc(-50% + ${avatarState.offsetY}px))`;
-        avatarEmptyState.style.display = 'none';
-
-        avatarOutputContext.clearRect(0, 0, 64, 64);
-        const sourceSize = stageSize / renderScale;
-        const sourceX = avatarState.image.naturalWidth / 2 - (sourceSize / 2) - (avatarState.offsetX / renderScale);
-        const sourceY = avatarState.image.naturalHeight / 2 - (sourceSize / 2) - (avatarState.offsetY / renderScale);
-
-        avatarOutputContext.drawImage(
-          avatarState.image,
-          Math.max(0, Math.min(avatarState.image.naturalWidth - sourceSize, sourceX)),
-          Math.max(0, Math.min(avatarState.image.naturalHeight - sourceSize, sourceY)),
-          Math.min(sourceSize, avatarState.image.naturalWidth),
-          Math.min(sourceSize, avatarState.image.naturalHeight),
-          0,
-          0,
-          64,
-          64
-        );
-
-        saveAvatarBtn.disabled = !avatarState.dirty;
-      }
-
-      function resetAvatarCrop() {
-        if (!avatarState.image) return;
-        avatarState.zoom = 1;
-        avatarState.offsetX = 0;
-        avatarState.offsetY = 0;
-        avatarZoomInput.value = '1';
-        avatarState.dirty = true;
-        renderAvatarPreview();
-      }
-
-      async function setAvatarFromUrl(url) {
-        const loadedImage = await loadImageFromUrl(url);
-        avatarState.image = loadedImage;
-        avatarState.imageUrl = url;
-        avatarState.baseScale = Math.max(getAvatarStageSize() / loadedImage.naturalWidth, getAvatarStageSize() / loadedImage.naturalHeight);
-        avatarState.zoom = 1;
-        avatarState.offsetX = 0;
-        avatarState.offsetY = 0;
-        avatarZoomInput.value = '1';
-        avatarState.dirty = false;
-        renderAvatarPreview();
-      }
-
-      avatarInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const objectUrl = URL.createObjectURL(file);
-        const img = new Image();
-        img.onload = () => {
-          avatarState.image = img;
-          avatarState.imageUrl = objectUrl;
-          avatarState.baseScale = Math.max(getAvatarStageSize() / img.naturalWidth, getAvatarStageSize() / img.naturalHeight);
-          avatarState.zoom = 1;
-          avatarState.offsetX = 0;
-          avatarState.offsetY = 0;
-          avatarZoomInput.value = '1';
-          avatarState.dirty = true;
-          renderAvatarPreview();
-        };
-        img.onerror = () => {
-          URL.revokeObjectURL(objectUrl);
-          avatarMsg.textContent = 'That image could not be loaded.';
-          avatarMsg.className = 'status-msg status-error';
-        };
-        img.src = objectUrl;
-      };
-
-      avatarZoomInput.oninput = () => {
-        avatarState.zoom = Number(avatarZoomInput.value || '1');
-        if (avatarState.image) avatarState.dirty = true;
-        renderAvatarPreview();
-      };
-
-      avatarResetBtn.onclick = () => {
-        resetAvatarCrop();
-      };
-
-      avatarRemoveBtn.onclick = async () => {
-        try {
-          avatarMsg.textContent = 'Removing profile picture...';
-          avatarMsg.className = 'status-msg';
-
-          await clearStoredAvatar();
-
-          avatarState.image = null;
-          avatarState.imageUrl = '';
-          avatarState.baseScale = 1;
-          avatarState.zoom = 1;
-          avatarState.offsetX = 0;
-          avatarState.offsetY = 0;
-          avatarState.dirty = false;
-          avatarInput.value = '';
-          avatarZoomInput.value = '1';
-          avatarCropImage.removeAttribute('src');
-          renderAvatarPreview();
-
-          avatarMsg.textContent = 'Profile picture removed.';
-          avatarMsg.className = 'status-msg status-success';
-        } catch (err) {
-          console.error('Failed to remove avatar:', err);
-          avatarMsg.textContent = 'Failed to remove profile picture: ' + err.message;
-          avatarMsg.className = 'status-msg status-error';
-        }
-      };
-
-      avatarCropStage.addEventListener('pointerdown', (e) => {
-        if (!avatarState.image) return;
-        avatarState.isDragging = true;
-        avatarCropStage.setPointerCapture(e.pointerId);
-        avatarState.startX = e.clientX;
-        avatarState.startY = e.clientY;
-        avatarState.dragOffsetX = avatarState.offsetX;
-        avatarState.dragOffsetY = avatarState.offsetY;
-      });
-
-      avatarCropStage.addEventListener('pointermove', (e) => {
-        if (!avatarState.isDragging || !avatarState.image) return;
-        avatarState.offsetX = avatarState.dragOffsetX + (e.clientX - avatarState.startX);
-        avatarState.offsetY = avatarState.dragOffsetY + (e.clientY - avatarState.startY);
-        avatarState.dirty = true;
-        renderAvatarPreview();
-      });
-
-      const stopAvatarDrag = () => {
-        avatarState.isDragging = false;
-      };
-      avatarCropStage.addEventListener('pointerup', stopAvatarDrag);
-      avatarCropStage.addEventListener('pointercancel', stopAvatarDrag);
-
-      saveAvatarBtn.onclick = async () => {
-        if (!avatarState.image) return;
-
-        try {
-          avatarMsg.textContent = 'Saving profile picture...';
-          avatarMsg.className = 'status-msg';
-
-          const uploadCanvas = document.createElement('canvas');
-          uploadCanvas.width = 64;
-          uploadCanvas.height = 64;
-          const uploadContext = uploadCanvas.getContext('2d');
-          const renderScale = avatarState.baseScale * avatarState.zoom;
-          const stageSize = getAvatarStageSize();
-          const sourceSize = stageSize / renderScale;
-          const sourceX = avatarState.image.naturalWidth / 2 - (sourceSize / 2) - (avatarState.offsetX / renderScale);
-          const sourceY = avatarState.image.naturalHeight / 2 - (sourceSize / 2) - (avatarState.offsetY / renderScale);
-
-          uploadContext.drawImage(
-            avatarState.image,
-            Math.max(0, Math.min(avatarState.image.naturalWidth - sourceSize, sourceX)),
-            Math.max(0, Math.min(avatarState.image.naturalHeight - sourceSize, sourceY)),
-            Math.min(sourceSize, avatarState.image.naturalWidth),
-            Math.min(sourceSize, avatarState.image.naturalHeight),
-            0,
-            0,
-            64,
-            64
-          );
-
-          const avatarBlob = await new Promise(resolve => uploadCanvas.toBlob(resolve, 'image/jpeg', 0.85));
-          if (!avatarBlob) throw new Error('Could not generate the profile picture file.');
-
-          await clearStoredAvatar();
-
-          const storagePath = `avatars/${user.id}.jpg`;
-          const { error: uploadError } = await supabase.storage
-            .from('chat-files')
-            .upload(storagePath, avatarBlob, {
-              contentType: 'image/jpeg',
-              upsert: true
-            });
-
-          if (uploadError) throw uploadError;
-
-          avatarMsg.textContent = 'Profile picture saved to storage.';
-          avatarMsg.className = 'status-msg status-success';
-          avatarState.dirty = false;
-          saveAvatarBtn.disabled = true;
-        } catch (err) {
-          console.error(err);
-          avatarMsg.textContent = 'Failed to save picture: ' + err.message;
-          avatarMsg.className = 'status-msg status-error';
-        }
-      };
-
-      drawFallbackPreview(avatarOutputCanvas);
-
-      const { data: avatarFiles } = await supabase.storage.from('chat-files').list('avatars', {
-        limit: 1000,
-        sortBy: { column: 'name', order: 'desc' }
-      });
-      if (avatarFiles && avatarFiles.some(item => item.name === `${user.id}.jpg`)) {
-        try {
-          await setAvatarFromUrl(getAvatarPublicUrl(`avatars/${user.id}.jpg`));
-        } catch (err) {
-          console.error('Failed to load stored avatar:', err);
-          drawFallbackPreview(avatarOutputCanvas);
-        }
-      }
-
-      if (currentRenderToken !== settingsRenderToken) return;
-
-      // Render Background Theme Selector
-      const thumbContainer = document.getElementById("thumb-matrix-target");
-      if (!thumbContainer) return;
-      thumbContainer.innerHTML = "";
-      THEME_DATA_MAP.forEach(theme => {
-        const thumb = document.createElement("div");
-        thumb.className = `background-thumb-card ${currentBgSetting === theme.id ? 'active' : ''}`;
-        thumb.dataset.id = theme.id;
-
-        let canvasStyle = "";
-        if (theme.type === 'color') canvasStyle = `background-color: ${theme.val};`;
-        if (theme.type === 'gradient') canvasStyle = `background: ${theme.val};`;
-        if (theme.type === 'img') canvasStyle = `background-image: url('${theme.val}');`;
-
-        thumb.innerHTML = `<div class="thumb-canvas" style="${canvasStyle}"></div><div class="thumb-label">${theme.label}</div>`;
-
-        thumb.onclick = async () => {
-          document.querySelectorAll('.background-thumb-card').forEach(c => c.classList.remove('active'));
-          thumb.classList.add('active');
-          const bgMsg = document.getElementById("background-msg");
-
-          try {
-            window.CarsonGamesTheme.apply(theme.id);
-            await supabase.from("users").update({ background: theme.id }).eq("id", user.id);
-            bgMsg.textContent = "Theme updated!";
-            bgMsg.className = "status-msg status-success";
-          } catch(err) {
-            bgMsg.textContent = "Error saving theme.";
-            bgMsg.className = "status-msg status-error";
-          }
-        };
-        thumbContainer.appendChild(thumb);
-      });
-
-      // Render Owner Controls if role is 'owner'
-      if (currentUserRole === 'owner') {
-        const ownerSection = document.getElementById("owner-panel-injection-point");
-        ownerSection.innerHTML = `
-          <div class="settings-section">
-            <div class="section-header-controls">
-              <h3>Manage Announcements</h3>
-              <div class="pm-controls">
-                <button type="button" id="btn-add-box" class="btn-pm" title="Add text box underneath">+</button>
-                <button type="button" id="btn-remove-box" class="btn-pm btn-pm-minus" title="Remove bottom text box">-</button>
-              </div>
-            </div>
-
-            <div id="announcements-stack" class="announcements-box-stack">
-              <div style="color:var(--text-muted); font-size:0.9rem;">Loading announcements...</div>
-            </div>
-
-            <div class="btn-container">
-              <button type="button" id="btn-save-announcements" class="btn-primary">Save Changes</button>
-            </div>
-            <div id="announcement-msg" class="status-msg"></div>
-          </div>
-        `;
-
-        await loadAndPopulateAnnouncements();
-
-        document.getElementById("btn-add-box").onclick = () => {
-          const stack = document.getElementById("announcements-stack");
-          const newInput = document.createElement("input");
-          newInput.type = "text";
-          newInput.className = "announcement-input-field";
-          newInput.placeholder = "Type announcement text...";
-          stack.appendChild(newInput);
-          newInput.focus();
-        };
-
-        document.getElementById("btn-remove-box").onclick = () => {
-          const stack = document.getElementById("announcements-stack");
-          const inputs = stack.querySelectorAll(".announcement-input-field");
-          if (inputs.length > 0) {
-            inputs[inputs.length - 1].remove();
-          }
-        };
-
-        document.getElementById("btn-save-announcements").onclick = async () => {
-          const msgEl = document.getElementById("announcement-msg");
-          const stack = document.getElementById("announcements-stack");
-          const inputs = stack.querySelectorAll(".announcement-input-field");
-
-          const updatedTexts = Array.from(inputs)
-            .map(i => i.value.trim())
-            .filter(text => text.length > 0);
-
-          try {
-            msgEl.textContent = "Saving changes...";
-            msgEl.className = "status-msg";
-
-            const { error: deleteError } = await supabase.from("announcements").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-            if (deleteError) throw deleteError;
-
-            if (updatedTexts.length > 0) {
-              const rowsToInsert = updatedTexts.map(text => ({ text }));
-              const { error: insertError } = await supabase.from("announcements").insert(rowsToInsert);
-              if (insertError) throw insertError;
-            }
-
-            msgEl.textContent = "Announcements updated successfully!";
-            msgEl.className = "status-msg status-success";
-            await loadAndPopulateAnnouncements();
-          } catch (err) {
-            console.error("Save announcements error:", err);
-            msgEl.textContent = "Failed to save: " + err.message;
-            msgEl.className = "status-msg status-error";
-          }
-        };
-      }
-
-      // Username Form Submission
-      document.getElementById('username-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const newUsername = document.getElementById('username').value.trim();
-        const msgEl = document.getElementById('username-msg');
-        try {
-          await supabase.from("users").update({ username: newUsername }).eq("id", user.id);
-          msgEl.textContent = 'Username updated!';
-          msgEl.className = 'status-msg status-success';
-        } catch (err) {
-          msgEl.textContent = 'Failed to update username.';
-          msgEl.className = 'status-msg status-error';
-        }
-      };
-
-      // Password Form Submission
-      document.getElementById('password-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const newPassword = document.getElementById('new-password').value;
-        const confirmPassword = document.getElementById('confirm-password').value;
-        const msgEl = document.getElementById('password-msg');
-
-        if (newPassword !== confirmPassword) {
-          msgEl.textContent = 'Passwords do not match.';
-          msgEl.className = 'status-msg status-error';
-          return;
-        }
-
-        try {
-          msgEl.textContent = 'Updating password...';
-          msgEl.className = 'status-msg';
-
-          const { error } = await supabase.auth.updateUser({ password: newPassword });
-
-          if (error) throw error;
-
-          msgEl.textContent = 'Password updated successfully!';
-          msgEl.className = 'status-msg status-success';
-          document.getElementById('password-form').reset();
-        } catch (err) {
-          msgEl.textContent = err.message || 'Failed to update password.';
-          msgEl.className = 'status-msg status-error';
-        }
-      };
+    const stageSize=getAvatarStageSize();
+    const renderScale=avatarState.baseScale*avatarState.zoom;
+
+    const minZoom=Number(avatarZoomInput.min||1);
+    const maxZoom=Number(avatarZoomInput.max||3);
+    const zoomRange=maxZoom-minZoom;
+
+    const zoomFill=zoomRange>0
+      ?((avatarState.zoom-minZoom)/zoomRange)*100
+      :0;
+
+    avatarZoomInput.style.setProperty(
+      "--avatar-fill",
+      `${Math.max(0,Math.min(100,zoomFill))}%`
+    );
+
+    const clamped=clampAvatarOffsets(
+      avatarState.offsetX,
+      avatarState.offsetY,
+      renderScale
+    );
+
+    avatarState.offsetX=clamped.offsetX;
+    avatarState.offsetY=clamped.offsetY;
+
+    avatarCropImage.src=avatarState.imageUrl;
+    avatarCropImage.style.display="block";
+    avatarCropImage.style.width=`${avatarState.image.naturalWidth*renderScale}px`;
+    avatarCropImage.style.height=`${avatarState.image.naturalHeight*renderScale}px`;
+    avatarCropImage.style.transform=
+      `translate(calc(-50% + ${avatarState.offsetX}px),calc(-50% + ${avatarState.offsetY}px))`;
+
+    avatarEmptyState.style.display="none";
+
+    avatarOutputContext.clearRect(0,0,64,64);
+
+    const sourceSize=stageSize/renderScale;
+
+    const sourceX=
+      avatarState.image.naturalWidth/2-
+      sourceSize/2-
+      avatarState.offsetX/renderScale;
+
+    const sourceY=
+      avatarState.image.naturalHeight/2-
+      sourceSize/2-
+      avatarState.offsetY/renderScale;
+
+    const sx=Math.max(
+      0,
+      Math.min(
+        avatarState.image.naturalWidth-sourceSize,
+        sourceX
+      )
+    );
+
+    const sy=Math.max(
+      0,
+      Math.min(
+        avatarState.image.naturalHeight-sourceSize,
+        sourceY
+      )
+    );
+
+    const sw=Math.min(sourceSize,avatarState.image.naturalWidth);
+    const sh=Math.min(sourceSize,avatarState.image.naturalHeight);
+
+    avatarOutputContext.drawImage(
+      avatarState.image,
+      sx,sy,sw,sh,
+      0,0,64,64
+    );
+
+    saveAvatarBtn.disabled=!avatarState.dirty;
+  }
+
+  function resetAvatarCrop(){
+    if(!avatarState.image)return;
+
+    avatarState.zoom=1;
+    avatarState.offsetX=0;
+    avatarState.offsetY=0;
+    avatarZoomInput.value="1";
+    avatarState.dirty=true;
+
+    renderAvatarPreview();
+  }
+
+  async function setAvatarFromUrl(url){
+    const loadedImage=await loadImageFromUrl(url);
+
+    avatarState.image=loadedImage;
+    avatarState.imageUrl=url;
+    avatarState.baseScale=Math.max(
+      getAvatarStageSize()/loadedImage.naturalWidth,
+      getAvatarStageSize()/loadedImage.naturalHeight
+    );
+    avatarState.zoom=1;
+    avatarState.offsetX=0;
+    avatarState.offsetY=0;
+    avatarZoomInput.value="1";
+    avatarState.dirty=false;
+
+    renderAvatarPreview();
+  }
+
+  avatarInput.onchange=e=>{
+    const file=e.target.files?.[0];
+    if(!file)return;
+
+    if(!file.type.startsWith("image/")){
+      avatarMsg.textContent="Please choose an image file.";
+      avatarMsg.className="status-msg status-error";
+      avatarInput.value="";
+      return;
+    }
+
+    const objectUrl=URL.createObjectURL(file);
+    const img=new Image();
+
+    img.onload=()=>{
+      avatarState.image=img;
+      avatarState.imageUrl=objectUrl;
+      avatarState.baseScale=Math.max(
+        getAvatarStageSize()/img.naturalWidth,
+        getAvatarStageSize()/img.naturalHeight
+      );
+      avatarState.zoom=1;
+      avatarState.offsetX=0;
+      avatarState.offsetY=0;
+      avatarZoomInput.value="1";
+      avatarState.dirty=true;
+
+      avatarMsg.textContent="";
+      avatarMsg.className="status-msg";
+
+      renderAvatarPreview();
     };
 
-    /* FETCH ANNOUNCEMENTS FROM DATABASE & POPULATE INPUT FIELDS */
-    async function loadAndPopulateAnnouncements() {
-      const stack = document.getElementById("announcements-stack");
-      if (!stack) return;
+    img.onerror=()=>{
+      URL.revokeObjectURL(objectUrl);
+      avatarMsg.textContent="That image could not be loaded.";
+      avatarMsg.className="status-msg status-error";
+    };
 
-      const { data: records, error } = await supabase
-        .from("announcements")
-        .select("*")
-        .order("created_at", { ascending: true });
+    img.src=objectUrl;
+  };
 
-      stack.innerHTML = "";
+  avatarZoomInput.oninput=()=>{
+    avatarState.zoom=Number(avatarZoomInput.value||"1");
 
-      if (error) {
-        stack.innerHTML = `<div style="color:#ef4444; font-size:0.9rem;">Error loading entries: ${error.message}</div>`;
-        return;
-      }
-
-      if (!records || records.length === 0) {
-        const defaultInput = document.createElement("input");
-        defaultInput.type = "text";
-        defaultInput.className = "announcement-input-field";
-        defaultInput.placeholder = "Type announcement text...";
-        stack.appendChild(defaultInput);
-        return;
-      }
-
-      records.forEach(item => {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "announcement-input-field";
-        input.value = item.text;
-        stack.appendChild(input);
-      });
+    if(avatarState.image){
+      avatarState.dirty=true;
     }
 
-    supabase.auth.onAuthStateChange((event, session) => {
-      renderSettingsInterface(session?.user || null);
+    renderAvatarPreview();
+  };
+
+  avatarResetBtn.onclick=resetAvatarCrop;
+
+  avatarRemoveBtn.onclick=async()=>{
+    try{
+      avatarMsg.textContent="Removing profile picture...";
+      avatarMsg.className="status-msg";
+
+      await clearStoredAvatar(user);
+
+      avatarState.image=null;
+      avatarState.imageUrl="";
+      avatarState.baseScale=1;
+      avatarState.zoom=1;
+      avatarState.offsetX=0;
+      avatarState.offsetY=0;
+      avatarState.dirty=false;
+
+      avatarInput.value="";
+      avatarZoomInput.value="1";
+      avatarCropImage.removeAttribute("src");
+
+      renderAvatarPreview();
+
+      avatarMsg.textContent="Profile picture removed.";
+      avatarMsg.className="status-msg status-success";
+    }catch(err){
+      console.error("Failed to remove avatar:",err);
+
+      avatarMsg.textContent=
+        "Failed to remove profile picture: "+(err.message||"Unknown error");
+
+      avatarMsg.className="status-msg status-error";
+    }
+  };
+
+  avatarCropStage.addEventListener("pointerdown",e=>{
+    if(!avatarState.image)return;
+
+    avatarState.isDragging=true;
+
+    try{
+      avatarCropStage.setPointerCapture(e.pointerId);
+    }catch{}
+
+    avatarState.startX=e.clientX;
+    avatarState.startY=e.clientY;
+    avatarState.dragOffsetX=avatarState.offsetX;
+    avatarState.dragOffsetY=avatarState.offsetY;
+  });
+
+  avatarCropStage.addEventListener("pointermove",e=>{
+    if(!avatarState.isDragging||!avatarState.image)return;
+
+    avatarState.offsetX=
+      avatarState.dragOffsetX+(e.clientX-avatarState.startX);
+
+    avatarState.offsetY=
+      avatarState.dragOffsetY+(e.clientY-avatarState.startY);
+
+    avatarState.dirty=true;
+
+    renderAvatarPreview();
+  });
+
+  const stopAvatarDrag=()=>{
+    avatarState.isDragging=false;
+  };
+
+  avatarCropStage.addEventListener("pointerup",stopAvatarDrag);
+  avatarCropStage.addEventListener("pointercancel",stopAvatarDrag);
+  avatarCropStage.addEventListener("lostpointercapture",stopAvatarDrag);
+
+  saveAvatarBtn.onclick=async()=>{
+    if(!avatarState.image)return;
+
+    try{
+      avatarMsg.textContent="Saving profile picture...";
+      avatarMsg.className="status-msg";
+
+      const uploadCanvas=document.createElement("canvas");
+      uploadCanvas.width=64;
+      uploadCanvas.height=64;
+
+      const uploadContext=uploadCanvas.getContext("2d");
+      const renderScale=avatarState.baseScale*avatarState.zoom;
+      const stageSize=getAvatarStageSize();
+      const sourceSize=stageSize/renderScale;
+
+      const sourceX=
+        avatarState.image.naturalWidth/2-
+        sourceSize/2-
+        avatarState.offsetX/renderScale;
+
+      const sourceY=
+        avatarState.image.naturalHeight/2-
+        sourceSize/2-
+        avatarState.offsetY/renderScale;
+
+      const sx=Math.max(
+        0,
+        Math.min(
+          avatarState.image.naturalWidth-sourceSize,
+          sourceX
+        )
+      );
+
+      const sy=Math.max(
+        0,
+        Math.min(
+          avatarState.image.naturalHeight-sourceSize,
+          sourceY
+        )
+      );
+
+      const sw=Math.min(sourceSize,avatarState.image.naturalWidth);
+      const sh=Math.min(sourceSize,avatarState.image.naturalHeight);
+
+      uploadContext.drawImage(
+        avatarState.image,
+        sx,sy,sw,sh,
+        0,0,64,64
+      );
+
+      const avatarBlob=await new Promise(resolve=>
+        uploadCanvas.toBlob(resolve,"image/jpeg",.85)
+      );
+
+      if(!avatarBlob){
+        throw new Error("Could not generate the profile picture file.");
+      }
+
+      await clearStoredAvatar(user);
+
+      const storagePath=`avatars/${user.id}.jpg`;
+
+      const{error:uploadError}=await supabase.storage
+        .from("chat-files")
+        .upload(storagePath,avatarBlob,{
+          contentType:"image/jpeg",
+          upsert:true
+        });
+
+      if(uploadError)throw uploadError;
+
+      avatarMsg.textContent="Profile picture saved to storage.";
+      avatarMsg.className="status-msg status-success";
+
+      avatarState.dirty=false;
+      saveAvatarBtn.disabled=true;
+    }catch(err){
+      console.error(err);
+
+      avatarMsg.textContent=
+        "Failed to save picture: "+(err.message||"Unknown error");
+
+      avatarMsg.className="status-msg status-error";
+    }
+  };
+
+  drawFallbackPreview(avatarOutputCanvas,avatarSourceName);
+
+  const{data:avatarFiles}=await supabase.storage
+    .from("chat-files")
+    .list("avatars",{
+      limit:1000,
+      sortBy:{column:"name",order:"desc"}
     });
-  </script>
+
+  if(
+    avatarFiles&&
+    avatarFiles.some(item=>item.name===`${user.id}.jpg`)
+  ){
+    try{
+      await setAvatarFromUrl(
+        getAvatarPublicUrl(`avatars/${user.id}.jpg`)
+      );
+    }catch(err){
+      console.error("Failed to load stored avatar:",err);
+      drawFallbackPreview(avatarOutputCanvas,avatarSourceName);
+    }
+  }
+
+  if(currentRenderToken!==settingsRenderToken)return;
+
+  const thumbContainer=document.getElementById("thumb-matrix-target");
+  if(!thumbContainer)return;
+
+  thumbContainer.innerHTML="";
+
+  THEME_DATA_MAP.forEach(theme=>{
+    const thumb=document.createElement("div");
+
+    thumb.className=
+      `background-thumb-card ${currentBgSetting===theme.id?"active":""}`;
+
+    thumb.dataset.id=theme.id;
+
+    const canvas=document.createElement("div");
+    canvas.className="thumb-canvas";
+
+    if(theme.type==="color"){
+      canvas.style.backgroundColor=theme.val;
+    }else if(theme.type==="gradient"){
+      canvas.style.background=theme.val;
+    }else if(theme.type==="img"){
+      canvas.style.backgroundImage=`url("${theme.val}")`;
+    }
+
+    const label=document.createElement("div");
+    label.className="thumb-label";
+    label.textContent=theme.label;
+
+    thumb.appendChild(canvas);
+    thumb.appendChild(label);
+
+    thumb.onclick=async()=>{
+      document
+        .querySelectorAll(".background-thumb-card")
+        .forEach(c=>c.classList.remove("active"));
+
+      thumb.classList.add("active");
+
+      const bgMsg=document.getElementById("background-msg");
+
+      try{
+        window.CarsonGamesTheme?.apply(theme.id);
+
+        const{error}=await supabase
+          .from("users")
+          .update({background:theme.id})
+          .eq("id",user.id);
+
+        if(error)throw error;
+
+        bgMsg.textContent="Theme updated!";
+        bgMsg.className="status-msg status-success";
+      }catch(err){
+        console.error(err);
+
+        bgMsg.textContent="Error saving theme.";
+        bgMsg.className="status-msg status-error";
+      }
+    };
+
+    thumbContainer.appendChild(thumb);
+  });
+
+  if(currentUserRole==="owner"){
+    const ownerSection=
+      document.getElementById("owner-panel-injection-point");
+
+    ownerSection.innerHTML=`
+      <div class="settings-section">
+        <div class="section-header-controls">
+          <h3>Manage Announcements</h3>
+
+          <div class="pm-controls">
+            <button
+              type="button"
+              id="btn-add-box"
+              class="btn-pm"
+              title="Add text box underneath"
+            >+</button>
+
+            <button
+              type="button"
+              id="btn-remove-box"
+              class="btn-pm btn-pm-minus"
+              title="Remove bottom text box"
+            >-</button>
+          </div>
+        </div>
+
+        <div id="announcements-stack" class="announcements-box-stack">
+          <div style="color:var(--text-muted);font-size:.9rem">
+            Loading announcements...
+          </div>
+        </div>
+
+        <div class="btn-container">
+          <button
+            type="button"
+            id="btn-save-announcements"
+            class="btn-primary"
+          >
+            Save Changes
+          </button>
+        </div>
+
+        <div id="announcement-msg" class="status-msg"></div>
+      </div>
+    `;
+
+    await loadAndPopulateAnnouncements();
+
+    document.getElementById("btn-add-box").onclick=()=>{
+      const stack=document.getElementById("announcements-stack");
+
+      const input=document.createElement("input");
+      input.type="text";
+      input.className="announcement-input-field";
+      input.placeholder="Type announcement text...";
+      input.autocomplete="off";
+
+      stack.appendChild(input);
+      input.focus();
+    };
+
+    document.getElementById("btn-remove-box").onclick=()=>{
+      const stack=document.getElementById("announcements-stack");
+      const inputs=stack.querySelectorAll(
+        ".announcement-input-field"
+      );
+
+      if(inputs.length>0){
+        inputs[inputs.length-1].remove();
+      }
+    };
+
+    document.getElementById("btn-save-announcements").onclick=async()=>{
+      const msgEl=document.getElementById("announcement-msg");
+      const stack=document.getElementById("announcements-stack");
+
+      const inputs=stack.querySelectorAll(
+        ".announcement-input-field"
+      );
+
+      const updatedTexts=Array.from(inputs)
+        .map(i=>i.value.trim())
+        .filter(text=>text.length>0);
+
+      try{
+        msgEl.textContent="Saving changes...";
+        msgEl.className="status-msg";
+
+        const{error:deleteError}=await supabase
+          .from("announcements")
+          .delete()
+          .neq(
+            "id",
+            "00000000-0000-0000-0000-000000000000"
+          );
+
+        if(deleteError)throw deleteError;
+
+        if(updatedTexts.length>0){
+          const rowsToInsert=updatedTexts.map(text=>({text}));
+
+          const{error:insertError}=await supabase
+            .from("announcements")
+            .insert(rowsToInsert);
+
+          if(insertError)throw insertError;
+        }
+
+        msgEl.textContent="Announcements updated successfully!";
+        msgEl.className="status-msg status-success";
+
+        await loadAndPopulateAnnouncements();
+      }catch(err){
+        console.error("Save announcements error:",err);
+
+        msgEl.textContent=
+          "Failed to save: "+(err.message||"Unknown error");
+
+        msgEl.className="status-msg status-error";
+      }
+    };
+  }
+
+  document.getElementById("username-form").onsubmit=async e=>{
+    e.preventDefault();
+
+    const newUsername=
+      document.getElementById("username").value.trim();
+
+    const msgEl=document.getElementById("username-msg");
+
+    if(!newUsername){
+      msgEl.textContent="Please enter a username.";
+      msgEl.className="status-msg status-error";
+      return;
+    }
+
+    try{
+      const{error}=await supabase
+        .from("users")
+        .update({username:newUsername})
+        .eq("id",user.id);
+
+      if(error)throw error;
+
+      msgEl.textContent="Username updated!";
+      msgEl.className="status-msg status-success";
+    }catch(err){
+      console.error(err);
+
+      msgEl.textContent=
+        err.message||"Failed to update username.";
+
+      msgEl.className="status-msg status-error";
+    }
+  };
+
+  document.getElementById("password-form").onsubmit=async e=>{
+    e.preventDefault();
+
+    const password=
+      document.getElementById("new-password").value;
+
+    const confirmation=
+      document.getElementById("confirm-password").value;
+
+    const msgEl=document.getElementById("password-msg");
+
+    if(password.length<6){
+      msgEl.textContent="Password must be at least 6 characters.";
+      msgEl.className="status-msg status-error";
+      return;
+    }
+
+    if(password!==confirmation){
+      msgEl.textContent="Passwords do not match.";
+      msgEl.className="status-msg status-error";
+      return;
+    }
+
+    try{
+      msgEl.textContent="Updating password...";
+      msgEl.className="status-msg";
+
+      const{error}=await supabase.auth.updateUser({
+        password
+      });
+
+      if(error)throw error;
+
+      msgEl.textContent="Password updated successfully!";
+      msgEl.className="status-msg status-success";
+
+      document.getElementById("password-form").reset();
+    }catch(err){
+      console.error(err);
+
+      msgEl.textContent=
+        err.message||"Failed to update password.";
+
+      msgEl.className="status-msg status-error";
+    }
+  };
+}
+
+supabase.auth.onAuthStateChange((event,session)=>{
+  renderSettingsInterface(session?.user||null);
+});
+</script>
+
 </body>
 </html>
