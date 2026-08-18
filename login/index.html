@@ -2,146 +2,565 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | RapidIdentity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#06060c">
+  <title>Sign In | CarsonGames</title>
+
   <script src="../assets/theme-loader.js"></script>
   <link rel="stylesheet" href="../style.css">
+
   <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: radial-gradient(circle at top, rgba(108,99,255,0.12), transparent 45%), var(--bg); color: var(--text); font-family: var(--font); }
-    .auth-shell { width: min(520px, calc(100vw - 2rem)); padding: 2rem; background: var(--card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 30px 90px rgba(0,0,0,0.35); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
-    .auth-header { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.75rem; }
-    .auth-header h1 { margin: 0; font-family: var(--font-display); font-size: 2rem; letter-spacing: -0.04em; }
-    .auth-header p { margin: 0; color: var(--text-muted); line-height: 1.65; }
-    .auth-form { display: grid; gap: 1rem; }
-    .input-group { display: grid; gap: 0.45rem; }
-    .input-group label { font-size: 0.85rem; color: var(--text-muted); }
-    .input-group input { width: 100%; box-sizing: border-box; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 14px 16px; border-radius: 14px; font: inherit; }
-    .input-group input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px rgba(108,99,255,0.12); }
-    .auth-buttons { display: grid; gap: 0.85rem; }
-    .auth-actions { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-    .auth-actions button { border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 12px 16px; border-radius: 999px; cursor: pointer; transition: all 0.2s var(--ease); }
-    .auth-actions button:hover { border-color: var(--accent); transform: translateY(-1px); }
-    .hidden { display: none !important; }
+    html {
+      min-height: 100%;
+      -webkit-text-size-adjust: 100%;
+      text-rendering: optimizeLegibility;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      box-sizing: border-box;
+      padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+      background: radial-gradient(circle at top, rgba(108, 99, 255, 0.12), transparent 45%), var(--bg);
+      color: var(--text);
+      font-family: var(--font), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 500;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .auth-shell {
+      width: min(520px, 100%);
+      box-sizing: border-box;
+      padding: 2rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .auth-header {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .auth-header h1 {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font-display), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.04em;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .auth-header p {
+      margin: 0;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .input-group {
+      display: grid;
+      gap: 0.45rem;
+    }
+
+    .input-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .input-group input {
+      width: 100%;
+      min-height: 48px;
+      box-sizing: border-box;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-family: var(--font), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1.25;
+      -webkit-appearance: none;
+      appearance: none;
+      outline: none;
+      -webkit-text-fill-color: var(--text);
+      transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+    }
+
+    .input-group input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.7;
+      -webkit-text-fill-color: var(--text-muted);
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+      background: var(--surface);
+    }
+
+    /* Prevent Safari/iOS autofill from making text look inconsistent. */
+    .input-group input:-webkit-autofill,
+    .input-group input:-webkit-autofill:hover,
+    .input-group input:-webkit-autofill:focus {
+      -webkit-text-fill-color: var(--text);
+      caret-color: var(--text);
+      -webkit-box-shadow: 0 0 0 1000px var(--surface) inset;
+      box-shadow: 0 0 0 1000px var(--surface) inset;
+      transition: background-color 9999s ease-in-out 0s;
+    }
+
+    .auth-buttons {
+      display: grid;
+      gap: 0.85rem;
+    }
+
+    .auth-buttons button {
+      width: 100%;
+      min-height: 48px;
+      font-family: var(--font), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-weight: 700;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .auth-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .auth-actions span {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .auth-actions button {
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      padding: 12px 16px;
+      min-height: 44px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: var(--font), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      -webkit-font-smoothing: antialiased;
+      transition: border-color 0.2s var(--ease), transform 0.2s var(--ease), background 0.2s var(--ease);
+    }
+
+    .auth-actions button:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .auth-actions button:active {
+      transform: translateY(0);
+    }
+
+    .auth-actions button:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.12);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 560px) {
+      .auth-shell {
+        padding: 1.5rem;
+        border-radius: 20px;
+      }
+
+      .auth-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .auth-actions {
+        align-items: stretch;
+      }
+
+      .auth-actions button {
+        flex-shrink: 0;
+      }
+    }
+
+    @media (pointer: coarse) {
+      .input-group input {
+        min-height: 50px;
+      }
+
+      .auth-actions button {
+        min-height: 46px;
+      }
+    }
   </style>
+
   <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
 </head>
+
 <body>
-<main class="auth-shell">
-  <div class="auth-header"><h1 id="auth-title">Sign in</h1></div>
-  <form id="auth-form" class="auth-form">
-    <div id="name-field" class="input-group hidden">
-      <label for="name">Username</label>
-      <input id="name" type="text" placeholder="Username" autocomplete="username">
+  <main class="auth-shell">
+    <div class="auth-header">
+      <h1 id="auth-title">Sign in</h1>
     </div>
-    <div class="input-group">
-      <label for="email">Email address</label>
-      <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
-    </div>
-    <div class="input-group">
-      <label for="password">Password</label>
-      <input id="password" type="password" placeholder="••••••••" autocomplete="current-password" required>
-    </div>
-    <div class="auth-buttons"><button type="submit" id="auth-submit" class="btn-primary">Sign in</button></div>
-    <div class="auth-actions">
-      <span id="mode-text">Don’t have an account?</span>
-      <button type="button" id="toggle-mode">Create account</button>
-    </div>
-  </form>
-</main>
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
-const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
-const supabase = createClient(supabaseUrl, supabaseKey);
-const form = document.getElementById("auth-form");
-const title = document.getElementById("auth-title");
-const nameField = document.getElementById("name-field");
-const toggle = document.getElementById("toggle-mode");
-const submitBtn = document.getElementById("auth-submit");
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-const nameInput = document.getElementById("name");
-let signUpMode = false;
 
-nameInput.addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\s/g, ""); });
+    <form id="auth-form" class="auth-form" novalidate>
+      <div id="name-field" class="input-group hidden">
+        <label for="name">Username</label>
+        <input
+          id="name"
+          name="signup-username"
+          type="text"
+          placeholder="Username"
+          autocomplete="off"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          enterkeyhint="next"
+        >
+      </div>
 
-async function signUp(username, emailVal, passwordVal) {
-  username = username.trim();
-  if (!username) { alert("Username is required"); return false; }
-  if (/\s/.test(username)) { alert("Username cannot contain spaces!"); return false; }
+      <div class="input-group">
+        <label for="email">Email address</label>
+        <input
+          id="email"
+          name="login-email"
+          type="email"
+          placeholder="you@example.com"
+          autocomplete="username"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          inputmode="email"
+          enterkeyhint="next"
+          required
+        >
+      </div>
 
-  const { data: existingUsers, error: checkError } = await supabase.from("users").select("id").eq("username", username).limit(1);
-  if (checkError) { console.error("Error checking username:", checkError); alert("An error occurred while checking username availability. Please try again."); return false; }
-  if (existingUsers?.length) { alert("This username is already taken! Please choose a different one."); return false; }
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input
+          id="password"
+          name="login-password"
+          type="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+          enterkeyhint="done"
+          required
+        >
+      </div>
 
-  const { data, error } = await supabase.auth.signUp({ email: emailVal, password: passwordVal });
-  if (error) { alert(error.message); return false; }
-  if (!data?.user) { alert("Account creation did not return a user. Please try again."); return false; }
+      <div class="auth-buttons">
+        <button type="submit" id="auth-submit" class="btn-primary">Sign in</button>
+      </div>
 
-  const { error: profileError } = await supabase.from("users").insert([{
-    id: data.user.id,
-    username,
-    email: emailVal,
-    role: "user",
-    rank: "basic",
-    createdAt: Date.now()
-  }]);
+      <div class="auth-actions">
+        <span id="mode-text">Don't have an account?</span>
+        <button type="button" id="toggle-mode">Create account</button>
+      </div>
+    </form>
+  </main>
 
-  if (profileError) {
-    console.error("Failed to create user profile:", profileError);
-    // Do not send the user into the app with a missing profile.
-    await supabase.auth.signOut();
-    alert("Your account was created, but your profile could not be created. Please try again or contact the site owner.");
-    return false;
-  }
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  return true;
-}
+    const supabaseUrl = "https://hbynnertatvxpvtqctyg.supabase.co";
+    const supabaseKey = "sb_publishable_WnnU16Mfj1rmRJcEStOzeQ_BExLbP2C";
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
-async function signIn(emailVal, passwordVal) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email: emailVal, password: passwordVal });
-  if (error) { alert(error.message); return false; }
+    const form = document.getElementById("auth-form");
+    const title = document.getElementById("auth-title");
+    const nameField = document.getElementById("name-field");
+    const toggle = document.getElementById("toggle-mode");
+    const submitBtn = document.getElementById("auth-submit");
+    const modeText = document.getElementById("mode-text");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const nameInput = document.getElementById("name");
 
-  // Verify that the application profile exists before entering the app.
-  const { data: profile, error: profileError } = await supabase.from("users").select("id").eq("id", data.user.id).maybeSingle();
-  if (profileError || !profile) {
-    console.error("User profile missing or unavailable:", profileError);
-    await supabase.auth.signOut();
-    alert("Your account profile could not be loaded. Please contact the site owner.");
-    return false;
-  }
-  return true;
-}
+    let signUpMode = false;
 
-toggle.addEventListener("click", () => {
-  signUpMode = !signUpMode;
-  nameField.classList.toggle("hidden", !signUpMode);
-  nameInput.required = signUpMode;
-  title.textContent = signUpMode ? "Create account" : "Sign in";
-  submitBtn.textContent = signUpMode ? "Create account" : "Sign in";
-  document.getElementById("mode-text").textContent = signUpMode ? "Already have an account?" : "Don't have an account?";
-  toggle.textContent = signUpMode ? "Sign in" : "Create account";
-  password.autocomplete = signUpMode ? "new-password" : "current-password";
-});
+    nameInput.addEventListener("input", (event) => {
+      event.target.value = event.target.value.replace(/\s/g, "");
+    });
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const emailVal = email.value.trim();
-  const passwordVal = password.value;
-  const usernameVal = nameInput.value.trim();
-  if (!emailVal || !passwordVal) { alert("Enter email and password"); return; }
+    function updateAutocompleteMode() {
+      if (signUpMode) {
+        email.setAttribute("autocomplete", "email");
+        password.setAttribute("autocomplete", "new-password");
+        nameInput.setAttribute("autocomplete", "off");
+        nameInput.setAttribute("name", "signup-username");
+      } else {
+        email.setAttribute("autocomplete", "username");
+        password.setAttribute("autocomplete", "current-password");
+        nameInput.setAttribute("autocomplete", "off");
+      }
+    }
 
-  submitBtn.disabled = true;
-  try {
-    const ok = signUpMode ? await signUp(usernameVal, emailVal, passwordVal) : await signIn(emailVal, passwordVal);
-    if (ok) window.location.replace("../chat/");
-  } catch (error) {
-    console.error("Authentication Error:", error);
-    alert(error.message || "Authentication failed.");
-  } finally {
-    submitBtn.disabled = false;
-  }
-});
-</script>
+    async function signUp(username, emailVal, passwordVal) {
+      username = username.trim();
+
+      if (!username) {
+        alert("Username is required.");
+        return false;
+      }
+
+      if (/\s/.test(username)) {
+        alert("Username cannot contain spaces.");
+        return false;
+      }
+
+      if (passwordVal.length < 6) {
+        alert("Password must be at least 6 characters.");
+        return false;
+      }
+
+      const { data: existingUsers, error: checkError } =
+        await supabase
+          .from("users")
+          .select("id")
+          .eq("username", username)
+          .limit(1);
+
+      if (checkError) {
+        console.error("Error checking username:", checkError);
+        alert("An error occurred while checking username availability. Please try again.");
+        return false;
+      }
+
+      if (existingUsers?.length) {
+        alert("This username is already taken. Please choose a different one.");
+        return false;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email: emailVal,
+        password: passwordVal
+      });
+
+      if (error) {
+        alert(error.message);
+        return false;
+      }
+
+      if (!data?.user) {
+        alert("Account creation did not return a user. Please try again.");
+        return false;
+      }
+
+      /*
+       * If email confirmation is enabled in Supabase, the user may not
+       * receive an active session yet. The profile is still created here.
+       */
+      const { error: profileError } = await supabase
+        .from("users")
+        .insert([{
+          id: data.user.id,
+          username,
+          email: emailVal,
+          role: "user",
+          rank: "basic",
+          createdAt: Date.now()
+        }]);
+
+      if (profileError) {
+        console.error("Failed to create user profile:", profileError);
+
+        if (data.session) {
+          await supabase.auth.signOut();
+        }
+
+        alert(
+          "Your account was created, but your profile could not be created. " +
+          "Please try again or contact the site owner."
+        );
+
+        return false;
+      }
+
+      /*
+       * With email confirmation enabled, there may be no session yet.
+       * In that case, tell the user what happened instead of redirecting
+       * them to a page that requires authentication.
+       */
+      if (!data.session) {
+        alert(
+          "Your account was created. Please check your email to verify your account, then sign in."
+        );
+
+        signUpMode = false;
+        updateModeUI();
+        form.reset();
+        return false;
+      }
+
+      return true;
+    }
+
+    async function signIn(emailVal, passwordVal) {
+      const { data, error } =
+        await supabase.auth.signInWithPassword({
+          email: emailVal,
+          password: passwordVal
+        });
+
+      if (error) {
+        alert(error.message);
+        return false;
+      }
+
+      if (!data?.user) {
+        alert("Sign in failed. Please try again.");
+        return false;
+      }
+
+      const { data: profile, error: profileError } =
+        await supabase
+          .from("users")
+          .select("id")
+          .eq("id", data.user.id)
+          .maybeSingle();
+
+      if (profileError || !profile) {
+        console.error(
+          "User profile missing or unavailable:",
+          profileError
+        );
+
+        await supabase.auth.signOut();
+
+        alert(
+          "Your account profile could not be loaded. Please contact the site owner."
+        );
+
+        return false;
+      }
+
+      return true;
+    }
+
+    function updateModeUI() {
+      nameField.classList.toggle("hidden", !signUpMode);
+      nameInput.required = signUpMode;
+
+      title.textContent = signUpMode ? "Create account" : "Sign in";
+      submitBtn.textContent = signUpMode ? "Create account" : "Sign in";
+
+      modeText.textContent = signUpMode
+        ? "Already have an account?"
+        : "Don't have an account?";
+
+      toggle.textContent = signUpMode
+        ? "Sign in"
+        : "Create account";
+
+      updateAutocompleteMode();
+
+      if (signUpMode) {
+        nameInput.focus();
+      } else {
+        email.focus();
+      }
+    }
+
+    toggle.addEventListener("click", () => {
+      signUpMode = !signUpMode;
+
+      /*
+       * Clear the password field when switching modes. This prevents
+       * Safari/iCloud Keychain from leaving a login password sitting
+       * in the account-creation form.
+       */
+      password.value = "";
+
+      updateModeUI();
+    });
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const emailVal = email.value.trim();
+      const passwordVal = password.value;
+      const usernameVal = nameInput.value.trim();
+
+      if (!emailVal || !passwordVal) {
+        alert("Enter your email and password.");
+        return;
+      }
+
+      if (signUpMode && !usernameVal) {
+        alert("Enter a username.");
+        nameInput.focus();
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.setAttribute("aria-busy", "true");
+
+      const originalText = signUpMode
+        ? "Create account"
+        : "Sign in";
+
+      submitBtn.textContent = signUpMode
+        ? "Creating account..."
+        : "Signing in...";
+
+      try {
+        const success = signUpMode
+          ? await signUp(usernameVal, emailVal, passwordVal)
+          : await signIn(emailVal, passwordVal);
+
+        if (success) {
+          window.location.replace("../chat/");
+        }
+      } catch (error) {
+        console.error("Authentication Error:", error);
+        alert(error?.message || "Authentication failed.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+
+        /*
+         * Only restore the button text if the page is still in the
+         * same mode. This avoids overwriting UI changes after signup.
+         */
+        submitBtn.textContent = signUpMode
+          ? "Create account"
+          : originalText;
+      }
+    });
+
+    /*
+     * Apply the correct autocomplete state immediately.
+     */
+    updateAutocompleteMode();
+  </script>
 </body>
 </html>
